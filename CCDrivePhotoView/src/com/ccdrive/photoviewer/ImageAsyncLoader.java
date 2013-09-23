@@ -21,7 +21,7 @@ public class ImageAsyncLoader {
 		cache = ImageFileCache.getCashInstance();
 	}
 
-	public Bitmap loadDrawable(final String imageURL,
+	public Bitmap loadDrawable(final String imageURL,boolean isZip,
 			final ImageCallback imageCallback) {
 		if (imgeCache.containsKey(imageURL)) {
 			SoftReference<Bitmap> softReference = imgeCache.get(imageURL);

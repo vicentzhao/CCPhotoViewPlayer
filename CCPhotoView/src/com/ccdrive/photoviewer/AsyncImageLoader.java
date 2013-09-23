@@ -8,6 +8,8 @@ import java.lang.ref.SoftReference;
 import java.net.URL;
 import java.util.HashMap;
 
+import com.ccdrive.photoviewer.ImageAsyncLoader.ImageCallback;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
@@ -70,11 +72,6 @@ public class AsyncImageLoader {
         }
        
 //*************************************************************
-
-
-
-       
-       
        /**
          * 检查SDCard是否可用
          * @return
@@ -112,7 +109,6 @@ public class AsyncImageLoader {
                 Bitmap bmp = null;
                
                 if (isSDCardAvailable()) {
-
                         File file = new File(Environment.getExternalStorageDirectory(),this.myPath);
                         if (!file.exists()) {
                                 file.mkdirs();
@@ -224,9 +220,10 @@ public class AsyncImageLoader {
                                         is = new FileInputStream(file);
                                 }
                                 bmp = getFromCard(basePathFile.getAbsolutePath(), isZip);// 读取保存后的图片缓存
-                        } else {
-                                bmp = getFromUrl(imageUrl, isZip);// 从网络端下载
-                        }
+                        } 
+//                        else {
+//                                bmp = getFromUrl(imageUrl, isZip);// 从网络端下载
+//                        }
                 } catch (Exception e) {
                         e.printStackTrace();
                         return null;
@@ -281,7 +278,6 @@ public class AsyncImageLoader {
                         options.inSampleSize = 2;// 图片宽高都为原来的二分之一，即图片为原来的四分之一
                         bitmap = BitmapFactory.decodeStream(is, null, options);
                 } else {
-                       
                         bitmap = BitmapFactory.decodeStream(is);
                 }
                 return bitmap;
@@ -384,5 +380,57 @@ public class AsyncImageLoader {
                 }
                 return null;
         }
+        
+        /**
+         * 回调方法，用了加载图片
+         * @author CCDrive.ZhaoYiqun
+         *
+         */
+        
+    	public interface ImageCallback {
+    		public void imgeLoader(Bitmap draw, String imgeURL);
+    	}
+    	
+    	/**
+    	 * 加载相应的图片
+    	 * @param imageURL
+    	 * @param imageCallback
+    	 * @return
+    	 */
+    	
+//    	public Bitmap loadDrawable(final String imageURL,
+//    			final ImageCallback imageCallback,boolean isZIP) {
+//    			Bitmap image = loader.getImage(imageURL);
+//    			if(image!=null){
+//    				return image;
+//    			}
+////    		}
+//    		final Handler handler = new Handler() {
+//    			@Override
+//    			public void handleMessage(Message msg) {
+//    				// TODO Auto-generated method stub
+//    				super.handleMessage(msg);
+//    				imageCallback.imgeLoader((Bitmap) msg.obj, imageURL);
+//    			}
+//
+//    		};
+//    		new Thread() {
+//    			@Override
+//    			public void run() {
+//    				// TODO Auto-generated method stub
+//    				super.run();
+//    				Bitmap drawable = getImage(imageURL);
+//    				imgeCache.put(imageURL, new SoftReference<Bitmap>(drawable));
+//    				if(drawable!=null){
+//    				cache.saveBmpToSd(drawable, imageURL);
+//    				}
+//    				Message msg = handler.obtainMessage(0, drawable);
+//    				handler.sendMessage(msg);
+//    			}
+//
+//    		}.start();
+//
+//    		return null;
+//    	}
 }       
 

@@ -100,6 +100,7 @@ public class MainActivity extends Activity {
 		Intent intent = getIntent();
 		photoList = (ArrayList<String>) intent
 				.getSerializableExtra("photopath");
+		setTestData();
 		if(null==photoList||photoList.size()==0){
 			photoList=new ArrayList<String>();
 			String type = i.getStringExtra("type");
@@ -150,7 +151,7 @@ public class MainActivity extends Activity {
 			setPhotoView();
 		}
 		
-//		setTestData();
+		
 		
 	}
 	 
@@ -170,7 +171,7 @@ public class MainActivity extends Activity {
 			movie_count.setText("" + count);
 			if (photoList.size() != 0) {
 				String imageUrl = photoList.get(0);
-				imageLoader.loadDrawable(imageUrl, new ImageCallback() {
+				imageLoader.loadDrawable(imageUrl, true,new ImageCallback() {
 					@Override
 					public void imgeLoader(Bitmap draw, String imgeURL) {
 						imageSwitcher.setImageBitmap(draw);
@@ -301,7 +302,7 @@ public class MainActivity extends Activity {
 					.setBackgroundResource(R.drawable.grid_item_selector);
 			imageviewList[mCurrentPos].setScaleType(ImageView.ScaleType.FIT_XY);
 			String Url = photoList.get(j);
-			imageLoader.loadDrawable(Url, new ImageCallback() {
+			imageLoader.loadDrawable(Url,true, new ImageCallback() {
 				@Override
 				public void imgeLoader(Bitmap draw, String imgeURL) {
 					imageviewList[mCurrentPos].clearAnimation();
@@ -403,6 +404,7 @@ public class MainActivity extends Activity {
 				int begin = endCount;
 				int end = photoList.size() > (count + 10) ? (count + 10)
 						: photoList.size();
+				endCount=end;
 				setPhotoGroup(begin, end);
 			}
 
