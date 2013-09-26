@@ -110,8 +110,8 @@ public class MainActivity extends Activity {
 			System.out.println("收到的id为" + id);
 			HttpRequest.getInstance().setId(id);
 			HttpRequest.getInstance().setType(type);
-//			String path =HttpRequest.getInstance().getURL_DETAIL_INFO();
-			String path ="http://192.168.1.3:2014/html/workplay/workplay_10_137932008781600622_1.txt";
+			String path =HttpRequest.getInstance().getURL_DETAIL_INFO();
+//			String path ="http://192.168.1.3:2014/html/workplay/workplay_10_137932008781600622_1.txt";
 			System.out.println("要下载的组图地址为"+path+"====");
 			aQuery.ajax(path, String.class, new AjaxCallback<String>(){
 				@Override

@@ -56,6 +56,8 @@ public class MainActivity extends Activity {
 	private RelativeLayout loadingBar;
 	private int count = 1; // 判断是否到最后
 	private ArrayList<String> photoList;
+	private ArrayList<String> idList;
+
 	private View oldview;
 	private TextView movie_count;
 	private TextView movie_allcount;
@@ -64,6 +66,8 @@ public class MainActivity extends Activity {
 	private int width;
 	private int height;
 	private int endCount; // 判断当前页是否到最后，是否需要翻页
+	
+	/* String path ="http://192.168.1.3:2014/html/workplay/workplay_10_137932008781600622_1.txt"; */
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -100,7 +104,8 @@ public class MainActivity extends Activity {
 		Intent intent = getIntent();
 		photoList = (ArrayList<String>) intent
 				.getSerializableExtra("photopath");
-		setTestData();
+		idList = new ArrayList<String>();
+//		setTestData();
 		if(null==photoList||photoList.size()==0){
 			photoList=new ArrayList<String>();
 			String type = i.getStringExtra("type");
@@ -110,6 +115,7 @@ public class MainActivity extends Activity {
 			HttpRequest.getInstance().setId(id);
 			HttpRequest.getInstance().setType(type);
 			String path =HttpRequest.getInstance().getURL_DETAIL_INFO();
+//			String path ="http://192.168.1.3:2014/html/workplay/workplay_10_137932008781600622_1.txt";
 			System.out.println("要下载的组图地址为"+path+"====");
 			aQuery.ajax(path, String.class, new AjaxCallback<String>(){
 				@Override
@@ -123,9 +129,10 @@ public class MainActivity extends Activity {
 						if(null!=jaArray&&jaArray.length()!=0){
 							for (int j = 0; j < jaArray.length(); j++) {
 								JSONObject jo  = jaArray.getJSONObject(j);
-								if(!jo.isNull("videopath")&&!"".equals(jo.getString("videopath"))){
-								photoList.add(jo.getString("videopath"));
+								if(!jo.isNull("VIDEOPATH")&&!"".equals(jo.getString("VIDEOPATH"))){
+								photoList.add(jo.getString("VIDEOPATH"));
 							}
+								 idList.add(jo.getString("VIDEOID"));
 								}
 						}
 						setPhotoView();
@@ -150,11 +157,7 @@ public class MainActivity extends Activity {
 			loadingBar.setVisibility(View.GONE);
 			setPhotoView();
 		}
-		
-		
-		
 	}
-	 
 	 private  void setPhotoView(){
 			if (null==photoList||photoList.size() == 0) {
 				ToastUtil.showToast(MainActivity.this, "没有相关的组图信息,正在退出..");
@@ -171,7 +174,8 @@ public class MainActivity extends Activity {
 			movie_count.setText("" + count);
 			if (photoList.size() != 0) {
 				String imageUrl = photoList.get(0);
-				imageLoader.loadDrawable(imageUrl, true,new ImageCallback() {
+				String id = idList.get(0);
+				imageLoader.loadDrawable(imageUrl,false,id,new ImageCallback() {
 					@Override
 					public void imgeLoader(Bitmap draw, String imgeURL) {
 						imageSwitcher.setImageBitmap(draw);
@@ -180,15 +184,7 @@ public class MainActivity extends Activity {
 				imageSwitcher.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						// if (isShow) {
-						// movie_imageview_re.startAnimation(menu_in_Animation);
-						// isShow = false;
-						// } else {
-						// isShow = true;
-						// //
-						// imageSwitcher.setImageBitmap(bitMapList.get(mCurrentPos));
-						// movie_imageview_re.startAnimation(menu_out_Animation);
-						// }
+						
 					}
 				});
 				imageSwitcher.setOnTouchListener(new OnTouchListener() {
@@ -302,7 +298,8 @@ public class MainActivity extends Activity {
 					.setBackgroundResource(R.drawable.grid_item_selector);
 			imageviewList[mCurrentPos].setScaleType(ImageView.ScaleType.FIT_XY);
 			String Url = photoList.get(j);
-			imageLoader.loadDrawable(Url,true, new ImageCallback() {
+			String id = idList.get(j);
+			imageLoader.loadDrawable(Url,true,id,new ImageCallback() {
 				@Override
 				public void imgeLoader(Bitmap draw, String imgeURL) {
 					imageviewList[mCurrentPos].clearAnimation();
@@ -366,7 +363,6 @@ public class MainActivity extends Activity {
 					// movie_imageview_re
 					// .startAnimation(menu_out_Animation);
 					// }
-
 				}
 			});
 			// linearLayouts[j].addView(imageviewList[j]);
