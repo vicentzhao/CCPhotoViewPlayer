@@ -75,4 +75,15 @@ public class HttpRequest {
 	 public String getURL_DETAIL_INFO(){
 		 return "http://192.168.1.3:2014/html/workplay/workplay_"+type+"_"+id+"_1.txt";
 	 }
+	public String getNEWSPICTURES() {
+		// TODO Auto-generated method stub
+		return "http://192.168.1.3:8080/todayrec!querypic.action?jsonType=json&tid="+id;
+	}
+	
+	public String getIMAGEDOWNDOLADER(){
+		
+		return WEB_ROOT + "index/download.action?token=" + mytoken
+				+ "&inputPath=";
+	
+	}
 }

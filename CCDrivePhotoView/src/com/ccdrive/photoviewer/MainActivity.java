@@ -104,16 +104,16 @@ public class MainActivity extends Activity {
 		Intent intent = getIntent();
 		photoList = (ArrayList<String>) intent
 				.getSerializableExtra("photopath");
+		String type = i.getStringExtra("type");
+		String id = i.getStringExtra("id");
+		System.out.println("收到的type为" + type);
+		System.out.println("收到的id为" + id);
+		HttpRequest.getInstance().setId(id);
+		HttpRequest.getInstance().setType(type);
 		idList = new ArrayList<String>();
 //		setTestData();
-		if(null==photoList||photoList.size()==0){
+		if(null==photoList||photoList.size()==0&&!"3".equals(type)){
 			photoList=new ArrayList<String>();
-			String type = i.getStringExtra("type");
-			System.out.println("收到的type为" + type);
-			String id = i.getStringExtra("id");
-			System.out.println("收到的id为" + id);
-			HttpRequest.getInstance().setId(id);
-			HttpRequest.getInstance().setType(type);
 			String path =HttpRequest.getInstance().getURL_DETAIL_INFO();
 //			String path ="http://192.168.1.3:2014/html/workplay/workplay_10_137932008781600622_1.txt";
 			System.out.println("要下载的组图地址为"+path+"====");
@@ -154,8 +154,27 @@ public class MainActivity extends Activity {
 				}
 			});
 		}else{
-			loadingBar.setVisibility(View.GONE);
-			setPhotoView();
+//			loadingBar.setVisibility(View.GONE);
+//			setPhotoView();
+			String url =HttpRequest.getInstance().getNEWSPICTURES();
+			aQuery.ajax(url, String.class, new AjaxCallback<String>(){
+				@Override
+				public void callback(String url, String object,
+						AjaxStatus status) {
+					 try {
+						 loadingBar.setVisibility(View.GONE);
+						JSONObject jo = new JSONObject(object);
+						JSONArray ja = jo.getJSONArray("data");
+						for (int j = 0; j < ja.length(); j++) {
+							photoList.add(ja.getJSONObject(j).getString(""));
+						}
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
+			});
 		}
 	}
 	 private  void setPhotoView(){
