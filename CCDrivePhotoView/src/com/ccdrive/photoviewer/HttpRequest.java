@@ -2,7 +2,7 @@ package com.ccdrive.photoviewer;
 
 
 public class HttpRequest {
-	private String WEB_ROOT = "http://apk.vocy.com/";
+	private String WEB_ROOT = "http://192.168.1.3:8080/";
 
 	private static HttpRequest request;
 	private String apkuuid;
@@ -84,6 +84,5 @@ public class HttpRequest {
 		
 		return WEB_ROOT + "index/download.action?token=" + mytoken
 				+ "&inputPath=";
-	
 	}
 }

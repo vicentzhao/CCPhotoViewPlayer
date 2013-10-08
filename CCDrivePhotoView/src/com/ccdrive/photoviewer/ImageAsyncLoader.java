@@ -45,7 +45,7 @@ public class ImageAsyncLoader {
 
 	public Bitmap loadDrawable(final String imageURL, final boolean isZip,
 			final String id, final ImageCallback imageCallback) {
-		if (isZip) {
+		
 			if (imgeCache.containsKey(imageURL)) {
 				SoftReference<Bitmap> softReference = null;
 				if(isZip){
@@ -62,7 +62,7 @@ public class ImageAsyncLoader {
 			if (image != null) {
 				return image;
 			}
-		}
+		
 
 		final Handler handler = new Handler() {
 			@Override
@@ -85,7 +85,7 @@ public class ImageAsyncLoader {
 				imgeCache.put(imageURL+"mini", new SoftReference<Bitmap>(imageList.get(0)));
 				imgeCache.put(imageURL, new SoftReference<Bitmap>(imageList.get(1)));
 				if (imageList.get(0) != null) {
-					cache.saveBmpToSd(imageList.get(0), imageURL);
+					cache.saveBmpToSd(imageList.get(0), id);
 				}
 				if(isZip){
 					msg= handler.obtainMessage(0, imageList.get(0));
@@ -112,13 +112,14 @@ public class ImageAsyncLoader {
 			conn.setConnectTimeout(10 * 1000);
 			conn.setRequestMethod("GET");
 			conn.connect();
+			InputStream inputStream = conn.getInputStream();
 			if (conn.getResponseCode() == 200) {
 					BitmapFactory.Options options = new BitmapFactory.Options();
                     options.inSampleSize = 4;// 图片宽高都为原来的4分之一，即图片为原来的16分之一
 //				map = BitmapFactory.decodeStream(conn.getInputStream(),options);
-                    miniMap = BitmapFactory.decodeStream(conn.getInputStream(),null,options);
+                    miniMap = BitmapFactory.decodeStream(inputStream,null,options);
                     cache.saveBmpToSd(miniMap, id+"mini.cach");
-                     map = loadImgFromUrl(conn.getInputStream(),id);
+                     map = loadImgFromUrl(inputStream,id);
                      bitmaps.add(miniMap);
                      bitmaps.add(map);
 				return bitmaps;
@@ -146,7 +147,15 @@ public class ImageAsyncLoader {
 	public Bitmap loadImgFromUrl(InputStream is, String fileName) {
 		Bitmap bmp = null;
 		try {  
-			File basePathFile = new File(cache.getDirectory(), fileName);
+			String path =cache.getDirectory();
+			File basePathFile =new File(path);
+			if(!basePathFile.exists()){
+			basePathFile.mkdir();
+			}
+//			File basePathFile = new File(cache.getDirectory(), fileName);
+			
+			System.out.println("下载的路径为"+cache.getDirectory());
+			///storage/sdcard0/CCdrive/ccphotoviewer/imagecache
 			File file = new File(basePathFile, fileName + ".cach");
 			if (!file.exists()) {
 				file.createNewFile();
@@ -173,7 +182,7 @@ public class ImageAsyncLoader {
 			// 读取保存后的图片缓存
 
 			// else {
-			bmp = BitmapFactory.decodeFile(basePathFile.getAbsolutePath());
+			bmp = BitmapFactory.decodeFile(file.getAbsolutePath());
 			// }
 		} catch (Exception e) {
 			e.printStackTrace();
