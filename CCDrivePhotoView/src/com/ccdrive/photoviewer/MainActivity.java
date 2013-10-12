@@ -84,12 +84,14 @@ public class MainActivity extends Activity implements OnClickListener {
 		String type = i.getStringExtra("type");
 		String id = i.getStringExtra("id");
 		String token = i.getStringExtra("token");
+		String webroot=i.getStringExtra("webRootDetail");
 		System.out.println("收到的type为" + type);
 		System.out.println("收到的id为" + id);
 		System.out.println("收到的token为" + token);
 		// HttpRequest.getInstance().setId(id);
 //		HttpRequest.getInstance().setId("137465074908240001");
 		 HttpRequest.getInstance().setId(id);
+		 HttpRequest.getInstance().setSTATIC_WEB_ROOT(webroot);
 //		HttpRequest.getInstance().setType("3");
 		 HttpRequest.getInstance().setType(type);
 		 HttpRequest.getInstance().setMytoken(token);

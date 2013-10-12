@@ -2,8 +2,15 @@ package com.ccdrive.photoviewer;
 
 
 public class HttpRequest {
-	private String WEB_ROOT = "http://192.168.1.3:8080/";
+	private String WEB_ROOT = "http://apk.vocy.com/";
+	private String STATIC_WEB_ROOT="http://html.vocy.com/";
 
+	public String getSTATIC_WEB_ROOT() {
+		return STATIC_WEB_ROOT;
+	}
+	public void setSTATIC_WEB_ROOT(String sTATIC_WEB_ROOT) {
+		STATIC_WEB_ROOT = sTATIC_WEB_ROOT;
+	}
 	private static HttpRequest request;
 	private String apkuuid;
 	private String mac;
@@ -73,11 +80,11 @@ public class HttpRequest {
 	}
 	
 	 public String getURL_DETAIL_INFO(){
-		 return "http://192.168.1.3:2014/html/workplay/workplay_"+type+"_"+id+"_1.txt";
+		 return STATIC_WEB_ROOT+"html/workplay/workplay_"+type+"_"+id+"_1.txt";
 	 }
 	public String getNEWSPICTURES() {
 		// TODO Auto-generated method stub
-		return "http://192.168.1.3:8080/todayrec!querypic.action?jsonType=json&tid="+id;
+		return STATIC_WEB_ROOT+"todayrec!querypic.action?jsonType=json&tid="+id;
 	}
 	
 	public String getIMAGEDOWNDOLADER(){
