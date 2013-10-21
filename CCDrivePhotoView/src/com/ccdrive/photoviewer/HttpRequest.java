@@ -36,7 +36,7 @@ public class HttpRequest {
 	}
 	// 获取下载的uuid
 	public String getURL_UPDATE_APK() {
-		return "http://sys.vocy.com/android!getFunction.action?arg0=droidpc_app_getversion&arg1=";
+		return "http://api.vocy.com/android!getFunction.action?arg0=droidpc_app_getversion&arg1=";
 	}
 	public String getMac() {
 		return mac;
@@ -76,7 +76,7 @@ public class HttpRequest {
 		return request;
 	}
 	public String getURL_DOWN_UPDATE_APK() {
-		return "http://sys.vocy.com/apk_file/" + apkuuid + ".apk";
+		return "http://api.vocy.com/apk_file/" + apkuuid + ".apk";
 	}
 	
 	 public String getURL_DETAIL_INFO(){
@@ -84,7 +84,7 @@ public class HttpRequest {
 	 }
 	public String getNEWSPICTURES() {
 		// TODO Auto-generated method stub
-		return STATIC_WEB_ROOT+"todayrec!querypic.action?jsonType=json&tid="+id;
+		return WEB_ROOT+"todayrec!querypic.action?jsonType=json&tid="+id;
 	}
 	
 	public String getIMAGEDOWNDOLADER(){

@@ -515,8 +515,9 @@ public class MainActivityOld extends Activity {
 							HttpRequest.getInstance().setApkuuid(apkEntity[3]);
 							String path = HttpRequest.getInstance()
 									.getURL_DOWN_UPDATE_APK();
-							setUpdateDiago(path, apkEntity[1]);
-							System.out.println("更新的地址为" + path);
+//							setUpdateDiago(path, apkEntity[1]);
+//							System.out.println("更新的地址为" + path);
+							
 						}
 					}
 				}

@@ -84,7 +84,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		String type = i.getStringExtra("type");
 		String id = i.getStringExtra("id");
 		String token = i.getStringExtra("token");
-		String webroot=i.getStringExtra("webRootDetail");
+		String webroot=i.getStringExtra("webRoot");
 		System.out.println("收到的type为" + type);
 		System.out.println("收到的id为" + id);
 		System.out.println("收到的token为" + token);
@@ -92,6 +92,13 @@ public class MainActivity extends Activity implements OnClickListener {
 //		HttpRequest.getInstance().setId("137465074908240001");
 		 HttpRequest.getInstance().setId(id);
 		 HttpRequest.getInstance().setSTATIC_WEB_ROOT(webroot);
+		 if(!"".equals(webroot)&&null!=webroot){
+			 if(webroot.contains("192")){
+				 HttpRequest.getInstance().setSTATIC_WEB_ROOT("http://192.168.1.3:2014/");
+			 }else{
+				 HttpRequest.getInstance().setSTATIC_WEB_ROOT("http://html.vocy.com/"); 
+			 }
+		 }
 //		HttpRequest.getInstance().setType("3");
 		 HttpRequest.getInstance().setType(type);
 		 HttpRequest.getInstance().setMytoken(token);
@@ -197,6 +204,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			PackageInfo packInfos = packageManager.getPackageInfo(
 					getPackageName(), 0);
 			final String version = packInfos.versionName;
+			System.out.println("version"+version);
 			String packageName = packInfos.packageName;
 			String apkPath = HttpRequest.getInstance().getURL_UPDATE_APK()
 					+ packageName;
@@ -214,11 +222,13 @@ public class MainActivity extends Activity implements OnClickListener {
 						 */
 						String[] apkEntity = apkStr.split("\\[TAB\\]|\\[CR\\]");
 						if (!version.equals(apkEntity[2])) {
+							System.out.println(apkEntity[2]);
 							HttpRequest.getInstance().setApkuuid(apkEntity[3]);
 							String path = HttpRequest.getInstance()
 									.getURL_DOWN_UPDATE_APK();
-							setUpdateDiago(path, apkEntity[1]);
-							System.out.println("更新的地址为" + path);
+//							setUpdateDiago(path, apkEntity[1]);
+//							System.out.println("更新的地址为" + path);
+							UpdateApk.setInstall(aQuery.getContext(), apkEntity[1], path);
 						}
 					}
 				}
@@ -321,31 +331,41 @@ public class MainActivity extends Activity implements OnClickListener {
 		if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
 			if (count == photoList.size()) {
 				ToastUtil.showToast(aQuery.getContext(), "已经是最后一页了");
+				btn_pageDown.setVisibility(View.GONE);
+				btn_pageUp.setVisibility(View.VISIBLE);
 
 			} else {
-				if (count == photoList.size() - 1) {
-					btn_pageDown.setVisibility(View.GONE);
-				} else {
-					btn_pageDown.setVisibility(View.VISIBLE);
-					btn_pageUp.setVisibility(View.VISIBLE);
-				}
-				aQuery.find(R.id.image_main).image(photoList.get(count - 1));
+//				if (count == photoList.size() - 1) {
+//					btn_pageDown.setVisibility(View.GONE);
+//						btn_pageUp.setVisibility(View.VISIBLE);
+//				} else {
+//					btn_pageDown.setVisibility(View.VISIBLE);
+//					btn_pageUp.setVisibility(View.VISIBLE);
+//				}
+				btn_pageDown.setVisibility(View.VISIBLE);
+				btn_pageUp.setVisibility(View.VISIBLE);
 				count++;
+				aQuery.find(R.id.image_main).image(photoList.get(count - 1));
 				movie_count.setText(count + "");
 			}
 		}
 		if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
 			if (count == 1) {
 				ToastUtil.showToast(aQuery.getContext(), "已经是第一页");
+				btn_pageUp.setVisibility(View.GONE);
+				btn_pageDown.setVisibility(View.VISIBLE);
 			} else {
-				if (count == 2) {
-					btn_pageUp.setVisibility(View.GONE);
-				} else {
-					btn_pageDown.setVisibility(View.VISIBLE);
-					btn_pageUp.setVisibility(View.VISIBLE);
-				}
-				aQuery.find(R.id.image_main).image(photoList.get(count - 1));
+				btn_pageDown.setVisibility(View.VISIBLE);
+				btn_pageUp.setVisibility(View.VISIBLE);
+//				if (count == 2) {
+//					btn_pageUp.setVisibility(View.GONE);
+//					btn_pageDown.setVisibility(View.VISIBLE);
+//				} else {
+//					btn_pageDown.setVisibility(View.VISIBLE);
+//					btn_pageUp.setVisibility(View.VISIBLE);
+//				}
 				count--;
+				aQuery.find(R.id.image_main).image(photoList.get(count - 1));
 				movie_count.setText(count + "");
 			}
 		}

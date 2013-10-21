@@ -1,0 +1,45 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="600dip"
+    android:layout_height="300dip"
+    android:background="@drawable/barbg"
+    android:layout_gravity="center"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/tv_progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:textColor="@android:color/white"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tv_progressbar"
+        android:layout_marginBottom="38dp"
+        android:layout_marginLeft="27dp"
+        android:text="正在下载"
+        android:textColor="@android:color/white"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <ProgressBar
+        android:id="@+id/pb_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="500dip"
+        android:layout_height="20dip"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/tv_progressbar"
+        android:layout_marginLeft="35dp"
+        android:layout_marginTop="52dp"
+        android:background="@drawable/progressbarbj"
+        android:max="100"
+        android:paddingLeft="10dip"
+        android:paddingRight="10dip" />
+
+</RelativeLayout>
