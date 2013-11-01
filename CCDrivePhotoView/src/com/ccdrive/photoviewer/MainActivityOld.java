@@ -41,7 +41,7 @@ import android.widget.Toast;
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
-import com.ccdrive.photoviewer.ImageAsyncLoader.ImageCallback;
+import com.ccdrive.photoviewer.ImageAsyncLoaderOld.ImageCallback;
 
 public class MainActivityOld extends Activity {
 	private ImageView imageSwitcher;
@@ -62,7 +62,7 @@ public class MainActivityOld extends Activity {
 	private TextView movie_count;
 	private TextView movie_allcount;
 	private RelativeLayout movie_imageview_re;
-	private ImageAsyncLoader imageLoader;
+	private ImageAsyncLoaderOld imageLoader;
 	private int width;
 	private int height;
 	private int endCount; // 判断当前页是否到最后，是否需要翻页
@@ -85,7 +85,7 @@ public class MainActivityOld extends Activity {
 		RelativeLayout mainRelativeLayout = (RelativeLayout) findViewById(R.id.admain_view);
 		movie_imageview_re = (RelativeLayout) findViewById(R.id.movie_imageview_re);
 		mainRelativeLayout.setBackgroundResource(R.drawable.menu_bg);
-		imageLoader = new ImageAsyncLoader();
+		imageLoader = new ImageAsyncLoaderOld();
 		Intent i = getIntent();
 		menu_in_Animation = AnimationUtils.loadAnimation(MainActivityOld.this,
 				R.anim.buttom_menu_push_in);

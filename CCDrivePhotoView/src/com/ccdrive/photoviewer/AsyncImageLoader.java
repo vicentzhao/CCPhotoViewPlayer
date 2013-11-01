@@ -8,7 +8,7 @@ import java.lang.ref.SoftReference;
 import java.net.URL;
 import java.util.HashMap;
 
-import com.ccdrive.photoviewer.ImageAsyncLoader.ImageCallback;
+import com.ccdrive.photoviewer.ImageAsyncLoaderOld.ImageCallback;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

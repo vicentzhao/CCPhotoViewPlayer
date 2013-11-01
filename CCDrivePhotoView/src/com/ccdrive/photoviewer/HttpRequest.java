@@ -12,8 +12,20 @@ public class HttpRequest {
 		STATIC_WEB_ROOT = sTATIC_WEB_ROOT;
 	}
 	private static HttpRequest request;
+	
+	private String sid;              //上层专辑id
+	public String getSid() {
+		return sid;
+	}
+	public void setSid(String sid) {
+		this.sid = sid;
+	}
 	private String apkuuid;
 	private String mac;
+	
+	private int pageSize =50;
+	
+	private int  position ; //传过来的位置
 	
 	private String type;  //频道类型
 	
@@ -82,6 +94,11 @@ public class HttpRequest {
 	 public String getURL_DETAIL_INFO(){
 		 return STATIC_WEB_ROOT+"html/workplay/workplay_"+type+"_"+id+"_1.txt";
 	 }
+	 
+	public String  getURL_DETAIL_PHOTOPATH(){
+		return "http://192.168.1.3:8080/androidMagazineChannelAction!" +
+				"getMagazinePlay.action?token=myadmin&resultType=json&id="+id;
+	}
 	public String getNEWSPICTURES() {
 		// TODO Auto-generated method stub
 		return WEB_ROOT+"todayrec!querypic.action?jsonType=json&tid="+id;
@@ -92,4 +109,17 @@ public class HttpRequest {
 		return WEB_ROOT + "index/download.action?token=" + mytoken
 				+ "&inputPath=";
 	}
+	
+	 public String getALLPHOTOPATHS(){
+		 return WEB_ROOT+"androidChannelAction!artSpe" +
+		 		"cialWorksList.action?token="+mytoken+"&resultType=json&pageSize="+pageSize+"&id="+sid+"&currentPage=";
+	 }
+	 
+	 
+	 public String getALLPEOPLEPHOTOSPATHS(){
+		 return STATIC_WEB_ROOT + "html/actorwork/actorwork_" + type + "_" + id
+					+ "_" + -1 + "_" + pageSize + "_";
+	 }
+	
+	 
 }

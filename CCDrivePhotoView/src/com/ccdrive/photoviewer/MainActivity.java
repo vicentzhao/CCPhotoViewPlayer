@@ -1,6 +1,7 @@
 package com.ccdrive.photoviewer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,6 +16,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,6 +34,7 @@ import android.widget.TextView;
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
+import com.ccdrive.photoviewer.ImageAsyncLoader.ImageCallback;
 
 public class MainActivity extends Activity implements OnClickListener {
 
@@ -39,11 +42,15 @@ public class MainActivity extends Activity implements OnClickListener {
 	private ImageView image_main;
 	private TextView movie_count;
 	private TextView movie_allcount;
+	private TextView photo_content;
 	private Button btn_pageUp;
 	private Button btn_pageDown;
 	private ArrayList<String> photoList;
+	private ArrayList<String> contentList;
 	private ArrayList<String> idList;
-	private int count = 1; // 当前页
+	private int currentCount = 1; // 当前计数
+	private ImageAsyncLoader imageLoader;
+	private MATDialog mDialog;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -57,9 +64,14 @@ public class MainActivity extends Activity implements OnClickListener {
 		movie_allcount = (TextView) findViewById(R.id.movie_allcount);
 		btn_pageUp = (Button) findViewById(R.id.btn_app_pageup);
 		btn_pageDown = (Button) findViewById(R.id.btn_app_pagedown);
+		photo_content=(TextView) findViewById(R.id.photo_content);
 		btn_pageUp.setOnClickListener(this);
 		btn_pageDown.setOnClickListener(this);
+		btn_pageUp.setVisibility(View.GONE);
+		btn_pageDown.setSelected(true);
+		imageLoader =new ImageAsyncLoader();
 		checkVersion();
+		initDialog();
 		RelativeLayout mainRelativeLayout = (RelativeLayout) findViewById(R.id.admain_view);
 //		mainRelativeLayout.setBackgroundResource(R.drawable.menu_bg);
 		Intent i = getIntent();
@@ -80,17 +92,26 @@ public class MainActivity extends Activity implements OnClickListener {
 		// width = display.getWidth();
 		// height = display.getHeight();
 		// loadingBar.setVisibility(View.VISIBLE);
-		Intent intent = getIntent();
 		String type = i.getStringExtra("type");
 		String id = i.getStringExtra("id");
 		String token = i.getStringExtra("token");
 		String webroot=i.getStringExtra("webRoot");
+		String sid = i.getStringExtra("sid");
+		int position =i.getIntExtra("position", -1);
+		 String currentPage = i.getStringExtra("currentPage");
+		 if(position!=-1){
+			 currentCount =12*Integer.parseInt(currentPage)+position;
+		 }
+		  
+		 
+//		
 		System.out.println("收到的type为" + type);
 		System.out.println("收到的id为" + id);
 		System.out.println("收到的token为" + token);
 		// HttpRequest.getInstance().setId(id);
 //		HttpRequest.getInstance().setId("137465074908240001");
 		 HttpRequest.getInstance().setId(id);
+		 HttpRequest.getInstance().setId(sid);
 		 HttpRequest.getInstance().setSTATIC_WEB_ROOT(webroot);
 		 if(!"".equals(webroot)&&null!=webroot){
 			 if(webroot.contains("192")){
@@ -106,12 +127,15 @@ public class MainActivity extends Activity implements OnClickListener {
 //				"5AC3DF9A-2EB1-3E78-39F2-54F1EC89C494");
 		idList = new ArrayList<String>();
 		photoList = new ArrayList<String>();
+		contentList = new ArrayList<String>();
 		// setTestData();
-		if (!"3".equals(HttpRequest.getInstance().getType())) {
+		if (!"3".equals(HttpRequest.getInstance().getType())&&(!"27".equals(HttpRequest.getInstance().getType()))) {
 			String path = HttpRequest.getInstance().getURL_DETAIL_INFO();
+//			String path =HttpRequest.getInstance().getURL_DETAIL_PHOTOPATH();
 			// String path
 			// ="http://192.168.1.3:2014/html/workplay/workplay_10_137932008781600622_1.txt";
-			System.out.println("要下载的组图地址为" + path + "====");
+//			System.out.println("要下载的组图地址为" + path + "====");
+//			String path ="http://192.168.1.3:2014/html/workplay/workplay_27_138242209322440622_1.txt";
 			aQuery.ajax(path, String.class, new AjaxCallback<String>() {
 				@Override
 				public void callback(String url, String object,
@@ -119,7 +143,12 @@ public class MainActivity extends Activity implements OnClickListener {
 					// loadingBar.setVisibility(View.GONE);
 					if (null != object && !"{}".equals(object)) {
 						try {
-							System.out.println("下载下来的组图信息" + object);
+							//--------------------------------------
+//							  JSONObject  json =new JSONObject(object);
+//							  JSONArray jaArray =json.getJSONArray("data");
+							
+							//----------------------------------------
+							System.out.println("下载下来的组图信息"+ object);
 							JSONArray jaArray = new JSONArray(object);
 							if (null != jaArray && jaArray.length() != 0) {
 								for (int j = 0; j < jaArray.length(); j++) {
@@ -128,6 +157,9 @@ public class MainActivity extends Activity implements OnClickListener {
 											&& !"".equals(jo
 													.getString("VIDEOPATH"))) {
 										photoList.add(jo.getString("VIDEOPATH"));
+										if(!jo.isNull("SYNOPSIS")){
+										contentList.add(jo.getString("SYNOPSIS"));
+										}
 									}
 									idList.add(jo.getString("VIDEOID"));
 								}
@@ -183,15 +215,83 @@ public class MainActivity extends Activity implements OnClickListener {
 
 			});
 		}
-	}
-
+		else if("27".equals(HttpRequest.getInstance().getType())){
+			String url = HttpRequest.getInstance().getNEWSPICTURES();
+		}
+		
+	}    
+//    ArrayList list = new ArrayList();
+//    int index=0;
+//    int count;//总页数
+//    int pagesize=50;
+//    int curentpage=1;
+//	public HashMap getNextDate(String url){
+//		HashMap hs = new HashMap ();		
+//		index++;		
+//		if(pagesize>index){
+//			list.clear();
+//			aQuery.ajax(url, String.class, new AjaxCallback<String>(){
+//				@Override
+//				public void callback(String url, String object,
+//						AjaxStatus status) {
+//					// TODO Auto-generated method stub
+//					super.callback(url, object, status);
+//				}
+//			});
+//			index=1;
+//			curentpage++;
+//		}
+//		return getDate(url);
+//	}
+//	public HashMap getDate(String url){
+//		HashMap hs = new HashMap ();
+//		return (HashMap)list.get(index%pagesize);
+//	}
+//	public HashMap getPreDate(String url){
+//		HashMap hs = new HashMap ();
+//		index--;
+//		if(0>index){
+//			list.clear();
+//			//请求上一页数据
+//			index=pagesize;
+//		}
+//		return getDate(url);
+//	}
+	
+	 private void getData(String path){
+		  //算page=50时，应该显示第几页
+		
+		 aQuery.ajax(path, String.class, new AjaxCallback<String>(){
+			 @Override
+			public void callback(String url, String object, AjaxStatus status) {
+				 
+				  
+			}
+		 });		 
+	 }
 	private void setPhotoView() {
 		// TODO Auto-generated method stub
+		if(photoList.size()==1){
 		btn_pageUp.setVisibility(View.GONE);
+		btn_pageDown.setVisibility(View.GONE);
+		}
 		movie_allcount.setText(photoList.size() + "");
-		movie_count.setText(count + "");
+		movie_count.setText(currentCount + "");
+		if(contentList.size()!=0){
+		if(null!=contentList.get(currentCount-1)&&!"".equals(contentList.get(currentCount-1))){
+			photo_content.setText(contentList.get(currentCount-1));
+		}
+		}
 //		aQuery.find(R.id.image_main).image(photoList.get(count - 1));
-		aQuery.find(R.id.image_main).image(photoList.get(count - 1), true, true);
+//		aQuery.find(R.id.image_main).image(photoList.get(count - 1), true, true);
+//		aQuery.im
+		System.out.println("要加载的图片的数据为===========>"+photoList.get(currentCount - 1));
+		imageLoader.loadDrawable(photoList.get(currentCount - 1), mDialog,new ImageCallback() {
+			@Override
+			public void imgeLoader(Bitmap draw, String imgeURL) {
+				image_main.setImageBitmap(draw);
+			}
+		});
 	}
 
 	/**
@@ -288,48 +388,69 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-
+		 if(mDialog.isShowing()){
 		switch (v.getId()) {
+	
 		case R.id.btn_app_pagedown:
-			if (count == photoList.size()) {
+			if (currentCount == photoList.size()) {
 				ToastUtil.showToast(aQuery.getContext(), "已经是最后一页了");
 				return;
 			}
-			if (count == photoList.size() - 1) {
+			if (currentCount == photoList.size() - 1) {
 				btn_pageDown.setVisibility(View.GONE);
 			} else {
 				btn_pageDown.setVisibility(View.VISIBLE);
 				btn_pageUp.setVisibility(View.VISIBLE);
 			}
-			aQuery.find(R.id.image_main).image(photoList.get(count - 1));
-			count++;
-			movie_count.setText(count + "");
+//			aQuery.find(R.id.image_main).image(photoList.get(count - 1));
+			currentCount++;
+			if(null!=contentList.get(currentCount-1)&&!"".equals(contentList.get(currentCount-1))){
+				photo_content.setText(contentList.get(currentCount-1));
+			}
+			imageLoader.loadDrawable(photoList.get(currentCount - 1), mDialog,new ImageCallback() {
+				@Override
+				public void imgeLoader(Bitmap draw, String imgeURL) {
+					image_main.setImageBitmap(draw);
+				}
+			});
+			movie_count.setText(currentCount + "");
 			break;
 
 		case R.id.btn_app_pageup:
-			if (count == 1) {
+			if (currentCount == 1) {
 				ToastUtil.showToast(aQuery.getContext(), "已经是第一页");
 				return;
 			}
-			if (count == 2) {
+			if (currentCount == 2) {
 				btn_pageUp.setVisibility(View.GONE);
 			} else {
 				btn_pageDown.setVisibility(View.VISIBLE);
 				btn_pageUp.setVisibility(View.VISIBLE);
 			}
-			aQuery.find(R.id.image_main).image(photoList.get(count - 1));
-			count--;
-			movie_count.setText(count + "");
+			currentCount--;
+			if(null!=contentList.get(currentCount-1)&&!"".equals(contentList.get(currentCount-1))){
+				photo_content.setText(contentList.get(currentCount-1));
+			}
+//			aQuery.find(R.id.image_main).image(photoList.get(count - 1));
+			imageLoader.loadDrawable(photoList.get(currentCount - 1),mDialog, new ImageCallback() {
+				@Override
+				public void imgeLoader(Bitmap draw, String imgeURL) {
+					image_main.setImageBitmap(draw);
+				}
+			});
+			movie_count.setText(currentCount + "");
 			break;
 		}
-
+		 }
 	}
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		
+		 if(!mDialog.isShowing()&&photoList.size()!=1){
 
 		if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
-			if (count == photoList.size()) {
+			if (currentCount == photoList.size()) {
 				ToastUtil.showToast(aQuery.getContext(), "已经是最后一页了");
 				btn_pageDown.setVisibility(View.GONE);
 				btn_pageUp.setVisibility(View.VISIBLE);
@@ -343,18 +464,32 @@ public class MainActivity extends Activity implements OnClickListener {
 //					btn_pageUp.setVisibility(View.VISIBLE);
 //				}
 				btn_pageDown.setVisibility(View.VISIBLE);
+				btn_pageDown.setSelected(true);
+				btn_pageUp.setSelected(false);
 				btn_pageUp.setVisibility(View.VISIBLE);
-				count++;
-				aQuery.find(R.id.image_main).image(photoList.get(count - 1));
-				movie_count.setText(count + "");
+				currentCount++;
+//				aQuery.find(R.id.image_main).image(photoList.get(count - 1));
+				if(null!=contentList.get(currentCount-1)&&!"".equals(contentList.get(currentCount-1))){
+					photo_content.setText(contentList.get(currentCount-1));
+				}
+				imageLoader.loadDrawable(photoList.get(currentCount - 1),mDialog, new ImageCallback() {
+					@Override
+					public void imgeLoader(Bitmap draw, String imgeURL) {
+						image_main.setImageBitmap(draw);
+					}
+				});
+				movie_count.setText(currentCount + "");
 			}
 		}
 		if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
-			if (count == 1) {
+			
+			if (currentCount == 1) {
 				ToastUtil.showToast(aQuery.getContext(), "已经是第一页");
 				btn_pageUp.setVisibility(View.GONE);
 				btn_pageDown.setVisibility(View.VISIBLE);
 			} else {
+				btn_pageUp.setSelected(true);
+				btn_pageDown.setSelected(false);
 				btn_pageDown.setVisibility(View.VISIBLE);
 				btn_pageUp.setVisibility(View.VISIBLE);
 //				if (count == 2) {
@@ -364,12 +499,29 @@ public class MainActivity extends Activity implements OnClickListener {
 //					btn_pageDown.setVisibility(View.VISIBLE);
 //					btn_pageUp.setVisibility(View.VISIBLE);
 //				}
-				count--;
-				aQuery.find(R.id.image_main).image(photoList.get(count - 1));
-				movie_count.setText(count + "");
+				currentCount--;
+				if(null!=contentList.get(currentCount-1)&&!"".equals(contentList.get(currentCount-1))){
+					photo_content.setText(contentList.get(currentCount-1));
+				}
+//				aQuery.find(R.id.image_main).image(photoList.get(count - 1));
+				imageLoader.loadDrawable(photoList.get(currentCount - 1),mDialog, new ImageCallback() {
+					@Override
+					public void imgeLoader(Bitmap draw, String imgeURL) {
+						image_main.setImageBitmap(draw);
+					}
+				});
+				movie_count.setText(currentCount + "");
 			}
 		}
+		 }
 		return super.onKeyDown(keyCode, event);
 	}
+	
+	private MATDialog initDialog() {
+	mDialog = new MATDialog(aQuery.getContext(),R.style.dialog);
+	mDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_TOAST);
+//	mDialog.showMessage("正在加载");
+	return mDialog;
+}
 
 }
