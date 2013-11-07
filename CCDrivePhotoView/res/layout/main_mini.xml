@@ -3,14 +3,16 @@
     android:id="@+id/admain_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/btn_kuangbg"
     >
-
+    
     <ImageView
         android:id="@+id/image_main"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
         />
-
     <LinearLayout
         android:layout_width="180dip"
         android:layout_height="wrap_content"
@@ -18,21 +20,18 @@
         android:layout_gravity="center"
         android:background="@drawable/page_bg"
         android:gravity="center" >
-
         <TextView
             android:id="@+id/movie_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:textSize="30sp" />
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:text="/"
             android:textSize="30sp" />
-
         <TextView
             android:id="@+id/movie_allcount"
             android:layout_width="wrap_content"
@@ -40,7 +39,6 @@
             android:singleLine="true"
             android:textSize="30sp" />
     </LinearLayout>
-
     <Button
         android:id="@+id/btn_app_pagedown"
         android:layout_width="wrap_content"
@@ -51,7 +49,6 @@
         android:focusable="false"
         android:textSize="24dip"
         android:visibility="visible" />
-
     <Button
         android:id="@+id/btn_app_pageup"
         android:layout_width="wrap_content"
@@ -63,7 +60,6 @@
         android:gravity="right"
         android:textSize="24dip"
         android:visibility="visible" />
-
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -80,10 +76,10 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="5dip"
                 android:gravity="left"
-                android:text="helllll"
                 android:background="@drawable/contennt_bg"
                 android:ellipsize="end"
                 android:lines="3"
                 android:textSize="30sp" />
+
 
 </RelativeLayout>

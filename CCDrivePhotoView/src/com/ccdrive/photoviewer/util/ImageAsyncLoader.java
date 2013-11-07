@@ -1,4 +1,4 @@
-package com.ccdrive.photoviewer;
+package com.ccdrive.photoviewer.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,8 +10,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
@@ -19,20 +20,34 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.ccdrive.photoviewer.MATDialog;
+
 public class ImageAsyncLoader {
-	private HashMap<String, SoftReference<Bitmap>> imgeCache;
-	ImageFileCache cache ;
+	private static HashMap<String, SoftReference<Bitmap>> imgeCache;
+	static ImageFileCache cache ;
 	private final static  int DIALOGSHOW =10001;
 	private final int DIALOGDISSMIS =10002;
+	MATDialog mDialog;
+	
+	
 	
 	  private static final String ImageFolder = "CCDrive/ImageCache";
-	public ImageAsyncLoader() {
-		imgeCache = new HashMap<String, SoftReference<Bitmap>>();
-		cache = ImageFileCache.getCashInstance();
+	  private static ImageAsyncLoader loader;
+		public static ImageAsyncLoader getInstance() {
+			if (loader == null) {
+				loader = new ImageAsyncLoader();
+				imgeCache = new HashMap<String, SoftReference<Bitmap>>();
+				cache = ImageFileCache.getCashInstance();
+			}
+			return loader;
+		}
+	private  ImageAsyncLoader() {
+		
 	}
 
-	public Bitmap loadDrawable(final String imageURL,final Dialog mDialog,
+	public Bitmap loadDrawable(final String imageURL,final MATDialog mDialog,
 			final ImageCallback imageCallback) {
+		this.mDialog =mDialog;
 		final Handler handler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
@@ -42,6 +57,7 @@ public class ImageAsyncLoader {
 				switch (msg.what) {
 				case DIALOGSHOW:
 					mDialog.show();
+					mDialog.setAnimation();
 					break;
 				case DIALOGDISSMIS:
 					mDialog.dismiss();
@@ -61,12 +77,12 @@ public class ImageAsyncLoader {
 				handler.sendMessage(msg);
 				return drawable;
 			}
+		}
 			Bitmap image = cache.getImage(imageURL);
 			if(image!=null){
 				Message msg = handler.obtainMessage(0, image);
 				handler.sendMessage(msg);
 				return image;
-			}
 		}
 		new Thread() {
 			@Override
@@ -77,6 +93,7 @@ public class ImageAsyncLoader {
 				Message ms = new Message();
 				ms.what=DIALOGSHOW;
 				handler.sendMessage(ms);
+				
 				Bitmap drawable = getImage(imageURL);
 				Message ms1 = new Message();
 				ms1.what=DIALOGDISSMIS;
@@ -184,6 +201,21 @@ public class ImageAsyncLoader {
     public static final boolean isSDCardAvailable(){
             return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
     }
+    
+    
+    private Timer timer ;
+    private TimerTask task;
+    
+   private void setTimeMonitor(){
+	  task = new TimerTask() {
+		
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			
+		}
+	};
+   }
 
 
 }

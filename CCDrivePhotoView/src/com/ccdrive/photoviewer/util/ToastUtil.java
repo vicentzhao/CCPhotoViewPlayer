@@ -1,4 +1,8 @@
-package com.ccdrive.photoviewer;
+package com.ccdrive.photoviewer.util;
+
+import com.ccdrive.photoviewer.R;
+import com.ccdrive.photoviewer.R.id;
+import com.ccdrive.photoviewer.R.layout;
 
 import android.content.Context;
 import android.view.Gravity;

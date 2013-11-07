@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="img">#00000000</color>
+    <color name="focused">#00ccff</color>
+    <color name="white">#ffffff</color>
+    <color name="textcolor">#4b4b4b</color>
+    <color name="textselcolor">#cc0000</color>
+    <color name="textbg">#003268</color>
+      <color name="transparent">#0000</color>
+      <color name="tv_episode_focused">#0075f7</color>
+      <color name="tv_episode_unfocused">#ff9900</color>
+      <color name="tv_episode_count_focused">#00448d</color>
+      <color name="tv_episode_count_unfocused">#002a56</color>
+      
+      <color name="controller_bg">#80006454</color>
+      <!-- 播放界面的一些参数 -->
+    <color name="text_color_f0f0f0">#fff0f0f0</color>
+     <color name="backgroundColor1">#ffce7900</color>
+     <color name="backgroundColor2">#191919</color>
+     <color name="dialog_progress">#AAFF00</color>
+    <color name="dialog_msg">#00AAFF</color>
+    
+    
+    <!-- 银行的一些参数 -->
+    
+    <color name="bank_textviewcolor">#818181</color>
+    
+    
+</resources>

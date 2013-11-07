@@ -1,8 +1,11 @@
-package com.ccdrive.photoviewer;
+package com.ccdrive.photoviewer.util;
 
 
 public class HttpRequest {
 	private String WEB_ROOT = "http://apk.vocy.com/";
+	public void setWEB_ROOT(String wEB_ROOT) {
+		WEB_ROOT = wEB_ROOT;
+	}
 	private String STATIC_WEB_ROOT="http://html.vocy.com/";
 
 	public String getSTATIC_WEB_ROOT() {
@@ -14,6 +17,13 @@ public class HttpRequest {
 	private static HttpRequest request;
 	
 	private String sid;              //上层专辑id
+	private int  currentPage ;    //当前第几页
+	public int getCurrentPage() {
+		return currentPage;
+	}
+	public void setCurrentPage(int currentPage) {
+		this.currentPage = currentPage;
+	}
 	public String getSid() {
 		return sid;
 	}
@@ -110,11 +120,22 @@ public class HttpRequest {
 				+ "&inputPath=";
 	}
 	
-	 public String getALLPHOTOPATHS(){
-		 return WEB_ROOT+"androidChannelAction!artSpe" +
-		 		"cialWorksList.action?token="+mytoken+"&resultType=json&pageSize="+pageSize+"&id="+sid+"&currentPage=";
-	 }
+//	 public String getALLPHOTOPATHS(){
+//		 return WEB_ROOT+"androidChannelAction!artSpe" +
+//		 		"cialWorksList.action?token="+mytoken+"&resultType=json&pageSize="+pageSize+"&id="+sid+"&currentPage="+currentPage;
+//	 }
 	 
+	 
+	 public String getArtsAllPhotos(){
+		 return WEB_ROOT+"androidChannelAction!getWorkPlay" +
+		 		".action?token="+mytoken+"&resultType=json&pageSize="+pageSize+
+		 		"&currentPage="+currentPage+"&channelid="+type+"&sid="+sid+"";
+	 }
+	 public String getArtsPeoPleAllPhotos(){
+		 return WEB_ROOT+"androidChannelAction!getWorkPlay" +
+				 ".action?token="+mytoken+"&resultType=json&pageSize="+pageSize+
+				 "&currentPage="+currentPage+"&channelid="+type+"&aid="+sid+"";
+	 }
 	 
 	 public String getALLPEOPLEPHOTOSPATHS(){
 		 return STATIC_WEB_ROOT + "html/actorwork/actorwork_" + type + "_" + id

@@ -1,4 +1,4 @@
-package com.ccdrive.photoviewer;
+package com.ccdrive.photoviewer.util;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -6,6 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import com.ccdrive.photoviewer.R;
+import com.ccdrive.photoviewer.R.string;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;

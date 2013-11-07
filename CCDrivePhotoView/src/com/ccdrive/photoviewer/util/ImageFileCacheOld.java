@@ -1,9 +1,10 @@
-package com.ccdrive.photoviewer;
+package com.ccdrive.photoviewer.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -14,28 +15,33 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.util.Log;
 
-public class ImageFileCache {
-	private static ImageFileCache imageCash =  null;
+public class ImageFileCacheOld {
+	private static ImageFileCacheOld imageCash =  null;
 	private static final String CACHDIR = "CCdrive/ccphotoviewer/imagecache";
 	private static final String WHOLESALE_CONV = ".cach";
 	/** 过期时间3天 **/
 	private static final long mTimeDiff = 3 * 24 * 60 * 60 * 1000;
   //单例模式
-	public synchronized static ImageFileCache getCashInstance(){
+	public synchronized static ImageFileCacheOld getCashInstance(){
 		if(imageCash==null){
-			imageCash = new ImageFileCache();
+			imageCash = new ImageFileCacheOld();
 		}
 		return imageCash;
 	}
 	//私有化构造函数
-	private ImageFileCache(){}
+	private ImageFileCacheOld(){}
 //	public ImageFileCache() {
 //		// 清理文件缓存
 //		removeCache(getDirectory());
 //	}
 
-	public Bitmap getImage(final String url) {
-		final String path = getDirectory() + "/" + convertUrlToFileName(url);
+	public Bitmap getImage(final String url,boolean isZip,String id) {
+		String path = null;
+		if(!isZip){
+		 path = getDirectory() + "/" + (id+WHOLESALE_CONV);
+		}else{
+			path = getDirectory() + "/" + (id+"mini"+WHOLESALE_CONV);
+		}
 		File file = new File(path);
 		if (file.exists()) {
 			Bitmap bmp = BitmapFactory.decodeFile(path);
@@ -50,7 +56,7 @@ public class ImageFileCache {
 	}
 	/*** 缓存空间大小 ****/
 	private static final int FREE_SD_SPACE_NEEDED_TO_CACHE = 10;
-	public void saveBmpToSd(Bitmap bm, String url) {
+	public void saveBmpToSd(Bitmap bm, String filename) {
 //		if (bm == null) {
 //			// 需要保存的是一个空值
 //			return;
@@ -60,7 +66,6 @@ public class ImageFileCache {
 			// SD空间不足
 			return;
 		}
-		String filename = convertUrlToFileName(url);
 		String dir = getDirectory();
 		File dirMk=new File(dir);
 		if(!dirMk.exists()){
@@ -79,6 +84,18 @@ public class ImageFileCache {
 		} catch (IOException e) {
 			Log.w("ImageFileCache", "IOException");
 		}
+	}
+	
+	/**
+	 *  直接下载转存到sd卡，分别存缩率图和原图
+	 * @param is
+	 * @param url
+	 */
+	
+	public void saveIoToSD(String url){
+		
+		
+		
 	}
 	private static final int CACHE_SIZE = 10;
 	// 清理缓存
@@ -192,7 +209,7 @@ public class ImageFileCache {
 		
 	}
 	/** 获得缓存目录 **/
-	private String getDirectory() {
+	public String getDirectory() {
 		String dir = getSDPath() + "/" + CACHDIR;
 		String substr = dir.substring(0, 4);
 		if (substr.equals("/mnt")) {

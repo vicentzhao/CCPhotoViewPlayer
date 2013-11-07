@@ -155,7 +155,11 @@ public class MainActivity extends Activity {
 //		setTestData();
 		
 	}
-	 
+	 @Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+	}
 	 private  void setPhotoView(){
 			if (null==photoList||photoList.size() == 0) {
 				ToastUtil.showToast(MainActivity.this, "没有相关的组图信息,正在退出..");

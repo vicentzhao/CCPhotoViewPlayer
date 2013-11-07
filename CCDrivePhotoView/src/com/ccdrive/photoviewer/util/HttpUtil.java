@@ -1,4 +1,4 @@
-package com.ccdrive.photoviewer;
+package com.ccdrive.photoviewer.util;
 
 import java.io.IOException;
 import java.io.InputStream;

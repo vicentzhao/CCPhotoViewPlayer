@@ -1,7 +1,12 @@
 package com.ccdrive.photoviewer;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,7 +25,6 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -28,13 +32,22 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
-import com.ccdrive.photoviewer.ImageAsyncLoader.ImageCallback;
+import com.ccdrive.photoviewer.bean.ArtsBean;
+import com.ccdrive.photoviewer.util.HttpRequest;
+import com.ccdrive.photoviewer.util.ImageAsyncLoader;
+import com.ccdrive.photoviewer.util.ImageAsyncLoader.ImageCallback;
+import com.ccdrive.photoviewer.util.JSONUtil;
+import com.ccdrive.photoviewer.util.PagenationBean;
+import com.ccdrive.photoviewer.util.ToastUtil;
+import com.ccdrive.photoviewer.util.UpdateApk;
+import com.ccdrive.photoviewer.util.UpdateVersion;
 
 public class MainActivity extends Activity implements OnClickListener {
 
@@ -48,10 +61,15 @@ public class MainActivity extends Activity implements OnClickListener {
 	private ArrayList<String> photoList;
 	private ArrayList<String> contentList;
 	private ArrayList<String> idList;
-	private int currentCount = 1; // µ±Ç°¼ÆÊı
+	private int currentCount = 1; // å½“å‰è®¡æ•°
 	private ImageAsyncLoader imageLoader;
 	private MATDialog mDialog;
-
+	private int listcount = 0;
+	private PagenationBean pagenationBean = new PagenationBean();
+	private boolean isLoading ; //åˆ¤æ–­æ˜¯å¦æ­£åœ¨åŠ è½½
+    private ArrayList<ArtsBean> arts;  //åŠ è½½è¿‡æ¥è‰ºæœ¯é›†åˆ
+    private int currentPage =1;//  å½“å‰é¡µ
+    private boolean  isFlag = true;
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -69,7 +87,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		btn_pageDown.setOnClickListener(this);
 		btn_pageUp.setVisibility(View.GONE);
 		btn_pageDown.setSelected(true);
-		imageLoader =new ImageAsyncLoader();
+		imageLoader =ImageAsyncLoader.getInstance();
 		checkVersion();
 		initDialog();
 		RelativeLayout mainRelativeLayout = (RelativeLayout) findViewById(R.id.admain_view);
@@ -94,25 +112,37 @@ public class MainActivity extends Activity implements OnClickListener {
 		// loadingBar.setVisibility(View.VISIBLE);
 		String type = i.getStringExtra("type");
 		String id = i.getStringExtra("id");
-		String token = i.getStringExtra("token");
+		String token= i.getStringExtra("mytoken");
+		System.out.println("ä¼ è¿‡æ¥çš„sidçš„============>"+token);
 		String webroot=i.getStringExtra("webRoot");
 		String sid = i.getStringExtra("sid");
+//		intent.putExtra("artFlag", "27_1");
+		String artFlag =i.getStringExtra("artFlag");
+		System.out.println("ä¼ è¿‡æ¥çš„sidçš„============>"+artFlag);
+		if(!"".equals(artFlag)&&null!=artFlag){
+			isFlag =false;
+		}
+		System.out.println("ä¼ è¿‡æ¥çš„sidçš„============>"+sid);
 		int position =i.getIntExtra("position", -1);
-		 String currentPage = i.getStringExtra("currentPage");
-		 if(position!=-1){
-			 currentCount =12*Integer.parseInt(currentPage)+position;
+		System.out.println("ä¼ è¿‡æ¥çš„positionçš„============>"+position);
+		
+		int currentPage = i.getIntExtra("currentPage",-1);
+		 System.out.println("ä¼ è¿‡æ¥çš„currentpage"+currentPage);
+		 if(position!=-1&&currentCount!=-1){
+			 currentCount =12*(currentPage-1)+position+1;
+			 currentPage=(currentCount+49)/50;
+			 HttpRequest.getInstance().setCurrentPage(currentPage);
+			 listcount=currentCount%50-1;
+				System.out.println("ä¼ è¿‡æ¥çš„countçš„============>"+listcount);
 		 }
-		  
-		 
-//		
-		System.out.println("ÊÕµ½µÄtypeÎª" + type);
-		System.out.println("ÊÕµ½µÄidÎª" + id);
-		System.out.println("ÊÕµ½µÄtokenÎª" + token);
+		System.out.println("æ”¶åˆ°çš„typeä¸º" + type);
+		System.out.println("æ”¶åˆ°çš„idä¸º" + id);
+		System.out.println("æ”¶åˆ°çš„tokenä¸º" + token);
 		// HttpRequest.getInstance().setId(id);
 //		HttpRequest.getInstance().setId("137465074908240001");
 		 HttpRequest.getInstance().setId(id);
-		 HttpRequest.getInstance().setId(sid);
-		 HttpRequest.getInstance().setSTATIC_WEB_ROOT(webroot);
+		 HttpRequest.getInstance().setSid(sid);
+		 HttpRequest.getInstance().setWEB_ROOT(webroot);
 		 if(!"".equals(webroot)&&null!=webroot){
 			 if(webroot.contains("192")){
 				 HttpRequest.getInstance().setSTATIC_WEB_ROOT("http://192.168.1.3:2014/");
@@ -130,11 +160,12 @@ public class MainActivity extends Activity implements OnClickListener {
 		contentList = new ArrayList<String>();
 		// setTestData();
 		if (!"3".equals(HttpRequest.getInstance().getType())&&(!"27".equals(HttpRequest.getInstance().getType()))) {
+			photo_content.setVisibility(View.GONE);
 			String path = HttpRequest.getInstance().getURL_DETAIL_INFO();
 //			String path =HttpRequest.getInstance().getURL_DETAIL_PHOTOPATH();
 			// String path
 			// ="http://192.168.1.3:2014/html/workplay/workplay_10_137932008781600622_1.txt";
-//			System.out.println("ÒªÏÂÔØµÄ×éÍ¼µØÖ·Îª" + path + "====");
+//			System.out.println("è¦ä¸‹è½½çš„ç»„å›¾åœ°å€ä¸º" + path + "====");
 //			String path ="http://192.168.1.3:2014/html/workplay/workplay_27_138242209322440622_1.txt";
 			aQuery.ajax(path, String.class, new AjaxCallback<String>() {
 				@Override
@@ -148,7 +179,7 @@ public class MainActivity extends Activity implements OnClickListener {
 //							  JSONArray jaArray =json.getJSONArray("data");
 							
 							//----------------------------------------
-							System.out.println("ÏÂÔØÏÂÀ´µÄ×éÍ¼ĞÅÏ¢"+ object);
+							System.out.println("ä¸‹è½½ä¸‹æ¥çš„ç»„å›¾ä¿¡æ¯"+ object);
 							JSONArray jaArray = new JSONArray(object);
 							if (null != jaArray && jaArray.length() != 0) {
 								for (int j = 0; j < jaArray.length(); j++) {
@@ -171,7 +202,7 @@ public class MainActivity extends Activity implements OnClickListener {
 						}
 					} else {
 						ToastUtil.showToast(MainActivity.this,
-								"Ã»ÓĞÏà¹ØµÄ×éÍ¼ĞÅÏ¢,ÕıÔÚÍË³ö..");
+								"æ²¡æœ‰ç›¸å…³çš„ç»„å›¾ä¿¡æ¯,æ­£åœ¨é€€å‡º..");
 						try {
 							Thread.sleep(1500);
 							finish();
@@ -184,10 +215,11 @@ public class MainActivity extends Activity implements OnClickListener {
 				}
 			});
 		} else if ("3".equals(HttpRequest.getInstance().getType())) {
+			photo_content.setVisibility(View.GONE);
 			// loadingBar.setVisibility(View.GONE);
 			// setPhotoView();
 			String url = HttpRequest.getInstance().getNEWSPICTURES();
-			System.out.println("ÒªÏÂÔØ×éÍ¼µÄµØÖ·Îª" + url);
+			System.out.println("è¦ä¸‹è½½ç»„å›¾çš„åœ°å€ä¸º" + url);
 			aQuery.ajax(url, String.class, new AjaxCallback<String>() {
 				@Override
 				public void callback(String url, String object,
@@ -200,7 +232,7 @@ public class MainActivity extends Activity implements OnClickListener {
 							photoList.add(HttpRequest.getInstance()
 									.getIMAGEDOWNDOLADER()
 									+ ja.getJSONObject(j).getString("PICPATH"));
-							System.out.println("ÒªÏÂÔØµÄ×éÍ¼µÄµØÖ·Îª====+"
+							System.out.println("è¦ä¸‹è½½çš„ç»„å›¾çš„åœ°å€ä¸º====+"
 									+ HttpRequest.getInstance()
 											.getIMAGEDOWNDOLADER()
 									+ ja.getJSONObject(j).getString("PICPATH"));
@@ -216,13 +248,26 @@ public class MainActivity extends Activity implements OnClickListener {
 			});
 		}
 		else if("27".equals(HttpRequest.getInstance().getType())){
-			String url = HttpRequest.getInstance().getNEWSPICTURES();
+			String url;
+			System.out.println(isFlag+"isflage========");
+			if(isFlag){
+			 url= HttpRequest.getInstance().getArtsAllPhotos();
+			}else{
+				url =HttpRequest.getInstance().getArtsPeoPleAllPhotos();
+			}
+			System.out.println("è¦å¯»æ‰¾çš„åœ°å€ä¸º+========ã€‹"+url);
+			if(currentCount!=1){
+				btn_pageDown.setVisibility(View.VISIBLE);
+				btn_pageUp.setVisibility(View.VISIBLE);
+			}
+			getAllArtsInfo(url, false,false);
+			
 		}
 		
 	}    
 //    ArrayList list = new ArrayList();
 //    int index=0;
-//    int count;//×ÜÒ³Êı
+//    int count;//æ€»é¡µæ•°
 //    int pagesize=50;
 //    int curentpage=1;
 //	public HashMap getNextDate(String url){
@@ -252,14 +297,14 @@ public class MainActivity extends Activity implements OnClickListener {
 //		index--;
 //		if(0>index){
 //			list.clear();
-//			//ÇëÇóÉÏÒ»Ò³Êı¾İ
+//			//è¯·æ±‚ä¸Šä¸€é¡µæ•°æ®
 //			index=pagesize;
 //		}
 //		return getDate(url);
 //	}
 	
 	 private void getData(String path){
-		  //Ëãpage=50Ê±£¬Ó¦¸ÃÏÔÊ¾µÚ¼¸Ò³
+		  //ç®—page=50æ—¶ï¼Œåº”è¯¥æ˜¾ç¤ºç¬¬å‡ é¡µ
 		
 		 aQuery.ajax(path, String.class, new AjaxCallback<String>(){
 			 @Override
@@ -285,7 +330,7 @@ public class MainActivity extends Activity implements OnClickListener {
 //		aQuery.find(R.id.image_main).image(photoList.get(count - 1));
 //		aQuery.find(R.id.image_main).image(photoList.get(count - 1), true, true);
 //		aQuery.im
-		System.out.println("Òª¼ÓÔØµÄÍ¼Æ¬µÄÊı¾İÎª===========>"+photoList.get(currentCount - 1));
+		System.out.println("è¦åŠ è½½çš„å›¾ç‰‡çš„æ•°æ®ä¸º===========>"+photoList.get(currentCount - 1));
 		imageLoader.loadDrawable(photoList.get(currentCount - 1), mDialog,new ImageCallback() {
 			@Override
 			public void imgeLoader(Bitmap draw, String imgeURL) {
@@ -300,7 +345,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private void checkVersion() {
 		try {
 			PackageManager packageManager = getPackageManager();
-			// getPackageName()ÊÇÄãµ±Ç°ÀàµÄ°üÃû£¬0´ú±íÊÇ»ñÈ¡°æ±¾ĞÅÏ¢
+			// getPackageName()æ˜¯ä½ å½“å‰ç±»çš„åŒ…åï¼Œ0ä»£è¡¨æ˜¯è·å–ç‰ˆæœ¬ä¿¡æ¯
 			PackageInfo packInfos = packageManager.getPackageInfo(
 					getPackageName(), 0);
 			final String version = packInfos.versionName;
@@ -315,9 +360,9 @@ public class MainActivity extends Activity implements OnClickListener {
 					if (apkStr != null) {
 						// TODO Auto-generated method stub
 						super.callback(url, apkStr, status);
-						// ¶¯Âş[TAB]com.ccdrive.comic[TAB]1.1.2.9[TAB]137048843775650001[CR]
+						// åŠ¨æ¼«[TAB]com.ccdrive.comic[TAB]1.1.2.9[TAB]137048843775650001[CR]
 						/**
-						 * apkEntity[0]=¶¯Âş apkEntity[1]=com.ccdrive.comic
+						 * apkEntity[0]=åŠ¨æ¼« apkEntity[1]=com.ccdrive.comic
 						 * apkEntity[2]=1.1.2.9 apkEntity[3]=137048843775650001
 						 */
 						String[] apkEntity = apkStr.split("\\[TAB\\]|\\[CR\\]");
@@ -327,7 +372,7 @@ public class MainActivity extends Activity implements OnClickListener {
 							String path = HttpRequest.getInstance()
 									.getURL_DOWN_UPDATE_APK();
 //							setUpdateDiago(path, apkEntity[1]);
-//							System.out.println("¸üĞÂµÄµØÖ·Îª" + path);
+//							System.out.println("æ›´æ–°çš„åœ°å€ä¸º" + path);
 							UpdateApk.setInstall(aQuery.getContext(), apkEntity[1], path);
 						}
 					}
@@ -349,8 +394,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		final Handler hd = new Handler();
 		// TODO Auto-generated method stub
 		Dialog dialog = new AlertDialog.Builder(aQuery.getContext())
-				.setTitle("·¢ÏÖĞÂ°æ±¾")
-				.setPositiveButton("È·ÈÏ", new DialogInterface.OnClickListener() {
+				.setTitle("å‘ç°æ–°ç‰ˆæœ¬")
+				.setPositiveButton("ç¡®è®¤", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						new AsyncTask<Void, Void, Void>() {
@@ -388,12 +433,13 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		 if(mDialog.isShowing()){
+		 if(!mDialog.isShowing()){
 		switch (v.getId()) {
 	
 		case R.id.btn_app_pagedown:
+			if(!mDialog.isShowing()&&photoList.size()!=1&&!"27".equals(HttpRequest.getInstance().getType())){
 			if (currentCount == photoList.size()) {
-				ToastUtil.showToast(aQuery.getContext(), "ÒÑ¾­ÊÇ×îºóÒ»Ò³ÁË");
+				ToastUtil.showToast(aQuery.getContext(), "å·²ç»æ˜¯æœ€åä¸€é¡µäº†");
 				return;
 			}
 			if (currentCount == photoList.size() - 1) {
@@ -404,9 +450,11 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 //			aQuery.find(R.id.image_main).image(photoList.get(count - 1));
 			currentCount++;
-			if(null!=contentList.get(currentCount-1)&&!"".equals(contentList.get(currentCount-1))){
-				photo_content.setText(contentList.get(currentCount-1));
-			}
+			if(contentList.size()!=0){
+				if(null!=contentList.get(currentCount-1)&&!"".equals(contentList.get(currentCount-1))){
+					photo_content.setText(contentList.get(currentCount-1));
+				}
+				}
 			imageLoader.loadDrawable(photoList.get(currentCount - 1), mDialog,new ImageCallback() {
 				@Override
 				public void imgeLoader(Bitmap draw, String imgeURL) {
@@ -414,11 +462,15 @@ public class MainActivity extends Activity implements OnClickListener {
 				}
 			});
 			movie_count.setText(currentCount + "");
+			}	 else if("27".equals(HttpRequest.getInstance().getType())){
+					 getNextPage();
+			 }
 			break;
 
 		case R.id.btn_app_pageup:
+			if(!mDialog.isShowing()&&photoList.size()!=1&&!"27".equals(HttpRequest.getInstance().getType())){
 			if (currentCount == 1) {
-				ToastUtil.showToast(aQuery.getContext(), "ÒÑ¾­ÊÇµÚÒ»Ò³");
+				ToastUtil.showToast(aQuery.getContext(), "å·²ç»æ˜¯ç¬¬ä¸€é¡µ");
 				return;
 			}
 			if (currentCount == 2) {
@@ -428,9 +480,11 @@ public class MainActivity extends Activity implements OnClickListener {
 				btn_pageUp.setVisibility(View.VISIBLE);
 			}
 			currentCount--;
-			if(null!=contentList.get(currentCount-1)&&!"".equals(contentList.get(currentCount-1))){
-				photo_content.setText(contentList.get(currentCount-1));
-			}
+			if(contentList.size()!=0){
+				if(null!=contentList.get(currentCount-1)&&!"".equals(contentList.get(currentCount-1))){
+					photo_content.setText(contentList.get(currentCount-1));
+				}
+				}
 //			aQuery.find(R.id.image_main).image(photoList.get(count - 1));
 			imageLoader.loadDrawable(photoList.get(currentCount - 1),mDialog, new ImageCallback() {
 				@Override
@@ -439,6 +493,9 @@ public class MainActivity extends Activity implements OnClickListener {
 				}
 			});
 			movie_count.setText(currentCount + "");
+			} else if("27".equals(HttpRequest.getInstance().getType())){
+				 getPrePage();
+		 }
 			break;
 		}
 		 }
@@ -446,12 +503,13 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		  
+		 if(!mDialog.isShowing()){
 		
-		 if(!mDialog.isShowing()&&photoList.size()!=1){
-
+		 if(!mDialog.isShowing()&&photoList.size()!=1&&!"27".equals(HttpRequest.getInstance().getType())){
 		if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
 			if (currentCount == photoList.size()) {
-				ToastUtil.showToast(aQuery.getContext(), "ÒÑ¾­ÊÇ×îºóÒ»Ò³ÁË");
+				ToastUtil.showToast(aQuery.getContext(), "å·²ç»æ˜¯æœ€åä¸€é¡µäº†");
 				btn_pageDown.setVisibility(View.GONE);
 				btn_pageUp.setVisibility(View.VISIBLE);
 
@@ -469,8 +527,10 @@ public class MainActivity extends Activity implements OnClickListener {
 				btn_pageUp.setVisibility(View.VISIBLE);
 				currentCount++;
 //				aQuery.find(R.id.image_main).image(photoList.get(count - 1));
+				if(contentList.size()!=0){
 				if(null!=contentList.get(currentCount-1)&&!"".equals(contentList.get(currentCount-1))){
 					photo_content.setText(contentList.get(currentCount-1));
+				}
 				}
 				imageLoader.loadDrawable(photoList.get(currentCount - 1),mDialog, new ImageCallback() {
 					@Override
@@ -484,7 +544,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
 			
 			if (currentCount == 1) {
-				ToastUtil.showToast(aQuery.getContext(), "ÒÑ¾­ÊÇµÚÒ»Ò³");
+				ToastUtil.showToast(aQuery.getContext(), "å·²ç»æ˜¯ç¬¬ä¸€é¡µ");
 				btn_pageUp.setVisibility(View.GONE);
 				btn_pageDown.setVisibility(View.VISIBLE);
 			} else {
@@ -500,8 +560,10 @@ public class MainActivity extends Activity implements OnClickListener {
 //					btn_pageUp.setVisibility(View.VISIBLE);
 //				}
 				currentCount--;
+				if(contentList.size()!=0){
 				if(null!=contentList.get(currentCount-1)&&!"".equals(contentList.get(currentCount-1))){
 					photo_content.setText(contentList.get(currentCount-1));
+				}
 				}
 //				aQuery.find(R.id.image_main).image(photoList.get(count - 1));
 				imageLoader.loadDrawable(photoList.get(currentCount - 1),mDialog, new ImageCallback() {
@@ -514,14 +576,227 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 		}
 		 }
+		 else if("27".equals(HttpRequest.getInstance().getType())){
+			 if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
+				 getPrePage();
+			 }
+			 if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
+				 getNextPage();
+			 }
+		 }
+		 }
 		return super.onKeyDown(keyCode, event);
 	}
 	
 	private MATDialog initDialog() {
 	mDialog = new MATDialog(aQuery.getContext(),R.style.dialog);
 	mDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_TOAST);
-//	mDialog.showMessage("ÕıÔÚ¼ÓÔØ");
+//	mDialog.showMessage("æ­£åœ¨åŠ è½½");
 	return mDialog;
 }
+	
+	private boolean  getNextPage(){
+		if (isLoading)
+			return true;
+		if (listcount == arts.size() - 1 && pagenationBean.isLastPage()) {
+			btn_pageDown.setVisibility(View.INVISIBLE);
+			btn_pageUp.setSelected(true);
+			btn_pageDown.setSelected(false);
+			return true;
+		}
+		listcount++;
+		if (listcount > pagenationBean.getPageSize() - 1) {
+			currentPage = currentPage + 1;
+			currentCount = currentCount + 1;
+			HttpRequest.getInstance().setCurrentPage(currentPage);
+			if(isFlag){
+				getAllArtsInfo(HttpRequest.getInstance().getArtsAllPhotos(),true ,false);
+				}else{
+					getAllArtsInfo(HttpRequest.getInstance().getArtsPeoPleAllPhotos(),true ,false);
+				}
+		} else {
+			currentCount = currentCount + 1;
+			setPage();	
+			btn_pageUp.setVisibility(View.VISIBLE);
+			btn_pageDown.setVisibility(View.VISIBLE);
+			btn_pageDown.setSelected(true);
+			btn_pageUp.setSelected(false);
+//			iv_img.requestFocus();
+//			iv_img.setFocusable(true);
+		}
+		return true;
+		
+	}
+	
+	 private boolean getPrePage(){
+			System.out.println("listcount==========>"+listcount);
+		 
+//			if (isLoading)
+//				return true;
+//			if (count == arts.size() - 1 && pagenationBean.isLastPage()) {
+//				btn_pageDown.setVisibility(View.INVISIBLE);
+//				btn_pageUp.setSelected(true);
+//				btn_pageDown.setSelected(false);
+//				return true;
+//			}
+//			count--;
+//			if (count > pagenationBean.getPageSize() - 1) {
+//				currentPage = currentPage - 1;
+//				currentCount = currentCount - 1;
+//				HttpRequest.getInstance().setCurrentPage(currentPage);
+//				getAllArtsInfo(HttpRequest.getInstance().getArtsAllPhotos(),false);
+//				return true;
+//			} else {
+//				currentCount = currentCount - 1;
+//				setPage();
+//				btn_pageUp.setVisibility(View.VISIBLE);
+//				btn_pageDown.setVisibility(View.VISIBLE);
+//				btn_pageDown.setSelected(true);
+//				btn_pageUp.setSelected(false);
+////				iv_img.requestFocus();
+////				iv_img.setFocusable(true);
+//			}
+//			
+//			return true;
+
+			if (isLoading)
+				return true;
+			if (pagenationBean.isFirstPage() && currentCount == 1) {
+				btn_pageUp.setVisibility(View.INVISIBLE);
+				btn_pageDown.setSelected(true);
+				btn_pageUp.setSelected(false);
+				return true;
+
+			} else {
+				if (listcount == 0 && currentPage > 1) {
+					currentPage = currentPage - 1;
+					currentCount = currentCount - 1;
+					HttpRequest.getInstance().setCurrentPage(currentPage);
+					if(isFlag){
+					getAllArtsInfo(HttpRequest.getInstance().getArtsAllPhotos(),false ,true);
+					}else{
+						getAllArtsInfo(HttpRequest.getInstance().getArtsPeoPleAllPhotos(),false ,true);
+					}
+					return true;
+				} else {
+					System.out.println("listcount==========>>>"+listcount);
+					listcount--;
+					currentCount = currentCount - 1;
+					setPage();
+					btn_pageDown.setVisibility(View.VISIBLE);
+					btn_pageUp.setVisibility(View.VISIBLE);
+					btn_pageUp.setSelected(true);
+					btn_pageDown.setSelected(false);
+					if (currentCount == 1) {
+						btn_pageUp.setVisibility(View.INVISIBLE);
+						btn_pageDown.setSelected(true);
+						btn_pageUp.setSelected(false);
+					}
+					return true;
+				}
+			}
+	 };
+	
+	
+	private void setPage(){
+		movie_count.setText(currentCount + "");
+		photo_content.setText(arts.get(listcount).getContent());
+		imageLoader.loadDrawable(arts.get(listcount).getVideoPath(), mDialog, new ImageCallback() {
+			
+			@Override
+			public void imgeLoader(Bitmap draw, String imgeURL) {
+				 image_main.setImageBitmap(draw);
+			}
+		});
+		
+		
+	}
+	private void  getAllArtsInfo(final String url,final boolean isnofirst,final boolean isleft){
+		   new AsyncTask<Void, Void, String>(){
+			   private String stream2String;
+			@Override
+			protected void onPreExecute() {
+				mDialog.show();
+				super.onPreExecute();
+			}
+
+			@Override
+			protected void onPostExecute(String result) {
+				mDialog.dismiss();
+				isLoading=false;
+				if(isnofirst){
+					listcount =0;
+				}else if(isleft){
+					listcount=49;
+				}
+				System.out.println("åœ¨postexexuteçš„æµ‹è¯•ä¸­=========="+listcount);
+				if (null != result && !"".equals(result)) {
+					try {
+						JSONObject  js=new JSONObject(result);
+						JSONObject jopage=js.getJSONObject("page");
+						int totalpage=Integer.parseInt(jopage.getString("totalRows"));
+						movie_allcount.setText(totalpage+"");
+						movie_count.setText(currentCount+"");
+						pagenationBean.init(jopage.getString("currentPage"), jopage.getString("pageSize"), Integer.parseInt(jopage.getString("totalRows")));
+						arts= JSONUtil.getArts(result);
+					
+							imageLoader.loadDrawable(arts.get(listcount).getVideoPath(), mDialog, new ImageCallback() {
+								
+								@Override
+								public void imgeLoader(Bitmap draw, String imgeURL) {
+									image_main.setImageBitmap(draw);
+								}
+							});
+							
+							photo_content.setText(arts.get(listcount).getContent());
+						
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+
+			@Override
+			protected String doInBackground(Void... params) {
+				try {
+					isLoading = true;
+					System.out.println("ä¸‹è½½çš„åœ°å€ä¸º===========" + url);
+					URL urls = new URL(url);
+					URLConnection conn = urls.openConnection();
+					InputStream stream = conn.getInputStream();
+					stream2String = Stream2String(stream);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				return stream2String;
+			
+			}
+			   
+		   }.execute();
+	}
+	
+	private String Stream2String(InputStream is) {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is),
+				16 * 1024); 
+		StringBuilder sb = new StringBuilder();
+
+		String line = null;
+		try {
+			while ((line = reader.readLine()) != null) { 
+				sb.append(line + "\n");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				is.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return sb.toString();
+	}
+	
 
 }

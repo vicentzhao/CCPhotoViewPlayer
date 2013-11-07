@@ -41,7 +41,11 @@ import android.widget.Toast;
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
-import com.ccdrive.photoviewer.ImageAsyncLoaderOld.ImageCallback;
+import com.ccdrive.photoviewer.util.HttpRequest;
+import com.ccdrive.photoviewer.util.ImageAsyncLoaderOld;
+import com.ccdrive.photoviewer.util.ToastUtil;
+import com.ccdrive.photoviewer.util.UpdateVersion;
+import com.ccdrive.photoviewer.util.ImageAsyncLoaderOld.ImageCallback;
 
 public class MainActivityOld extends Activity {
 	private ImageView imageSwitcher;

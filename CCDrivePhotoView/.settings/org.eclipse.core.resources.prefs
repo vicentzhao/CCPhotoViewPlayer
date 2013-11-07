@@ -1,8 +1,9 @@
-#Wed Oct 30 15:32:47 CST 2013
+#Mon Nov 04 16:26:20 CST 2013
 eclipse.preferences.version=1
-encoding//src/com/ccdrive/photoviewer/HttpRequest.java=UTF-8
-encoding//src/com/ccdrive/photoviewer/ImageFileCacheOld.java=UTF-8
+encoding//src/com/ccdrive/photoviewer/MainActivity.java=UTF-8
 encoding//src/com/ccdrive/photoviewer/MainActivityOld.java=UTF-8
-encoding//src/com/ccdrive/photoviewer/UpdateApk.java=UTF-8
-encoding//src/com/ccdrive/photoviewer/UpdateVersion.java=UTF-8
+encoding//src/com/ccdrive/photoviewer/util/HttpRequest.java=UTF-8
+encoding//src/com/ccdrive/photoviewer/util/ImageFileCacheOld.java=UTF-8
+encoding//src/com/ccdrive/photoviewer/util/UpdateApk.java=UTF-8
+encoding//src/com/ccdrive/photoviewer/util/UpdateVersion.java=UTF-8
 encoding/<project>=GBK

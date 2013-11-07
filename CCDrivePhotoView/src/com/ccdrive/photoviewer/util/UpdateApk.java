@@ -1,4 +1,9 @@
-package com.ccdrive.photoviewer;
+package com.ccdrive.photoviewer.util;
+
+import com.ccdrive.photoviewer.R;
+import com.ccdrive.photoviewer.R.id;
+import com.ccdrive.photoviewer.R.layout;
+import com.ccdrive.photoviewer.R.style;
 
 import android.app.Dialog;
 import android.content.Context;

@@ -1,4 +1,4 @@
-package com.ccdrive.photoviewer;
+package com.ccdrive.photoviewer.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,7 +8,7 @@ import java.lang.ref.SoftReference;
 import java.net.URL;
 import java.util.HashMap;
 
-import com.ccdrive.photoviewer.ImageAsyncLoaderOld.ImageCallback;
+import com.ccdrive.photoviewer.util.ImageAsyncLoaderOld.ImageCallback;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

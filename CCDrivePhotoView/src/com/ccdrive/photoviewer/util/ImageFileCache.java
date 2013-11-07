@@ -1,10 +1,9 @@
-package com.ccdrive.photoviewer;
+package com.ccdrive.photoviewer.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -15,33 +14,28 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.util.Log;
 
-public class ImageFileCacheOld {
-	private static ImageFileCacheOld imageCash =  null;
+public class ImageFileCache {
+	private static ImageFileCache imageCash =  null;
 	private static final String CACHDIR = "CCdrive/ccphotoviewer/imagecache";
 	private static final String WHOLESALE_CONV = ".cach";
-	/** 过期时间3天 **/
+	/** 过期时间3�?**/
 	private static final long mTimeDiff = 3 * 24 * 60 * 60 * 1000;
   //单例模式
-	public synchronized static ImageFileCacheOld getCashInstance(){
+	public synchronized static ImageFileCache getCashInstance(){
 		if(imageCash==null){
-			imageCash = new ImageFileCacheOld();
+			imageCash = new ImageFileCache();
 		}
 		return imageCash;
 	}
-	//私有化构造函数
-	private ImageFileCacheOld(){}
+	//私有化构造函�?
+	private ImageFileCache(){}
 //	public ImageFileCache() {
 //		// 清理文件缓存
 //		removeCache(getDirectory());
 //	}
 
-	public Bitmap getImage(final String url,boolean isZip,String id) {
-		String path = null;
-		if(!isZip){
-		 path = getDirectory() + "/" + (id+WHOLESALE_CONV);
-		}else{
-			path = getDirectory() + "/" + (id+"mini"+WHOLESALE_CONV);
-		}
+	public Bitmap getImage(final String url) {
+		final String path = getDirectory() + "/" + convertUrlToFileName(url);
 		File file = new File(path);
 		if (file.exists()) {
 			Bitmap bmp = BitmapFactory.decodeFile(path);
@@ -56,9 +50,9 @@ public class ImageFileCacheOld {
 	}
 	/*** 缓存空间大小 ****/
 	private static final int FREE_SD_SPACE_NEEDED_TO_CACHE = 10;
-	public void saveBmpToSd(Bitmap bm, String filename) {
+	public void saveBmpToSd(Bitmap bm, String url) {
 //		if (bm == null) {
-//			// 需要保存的是一个空值
+//			// �?��保存的是�?��空�?
 //			return;
 //		}
 		// 判断sdcard上的空间
@@ -66,6 +60,7 @@ public class ImageFileCacheOld {
 			// SD空间不足
 			return;
 		}
+		String filename = convertUrlToFileName(url);
 		String dir = getDirectory();
 		File dirMk=new File(dir);
 		if(!dirMk.exists()){
@@ -85,24 +80,12 @@ public class ImageFileCacheOld {
 			Log.w("ImageFileCache", "IOException");
 		}
 	}
-	
-	/**
-	 *  直接下载转存到sd卡，分别存缩率图和原图
-	 * @param is
-	 * @param url
-	 */
-	
-	public void saveIoToSD(String url){
-		
-		
-		
-	}
 	private static final int CACHE_SIZE = 10;
 	// 清理缓存
 	/**
-	 * 计算存储目录下的文件大小，
-	 * 当文件总大小大于规定的CACHE_SIZE或者sdcard剩余空间小于FREE_SD_SPACE_NEEDED_TO_CACHE的规定
-	 * 那么删除40%最近没有被使用的文件
+	 * 计算存储目录下的文件大小�?
+	 * 当文件�?大小大于规定的CACHE_SIZE或�?sdcard剩余空间小于FREE_SD_SPACE_NEEDED_TO_CACHE的规�?
+	 * 那么删除40%�?��没有被使用的文件
 	 * 
 	 * @param dirPath
 	 * @param filename
@@ -140,7 +123,7 @@ public class ImageFileCacheOld {
 		return true;
 	}
 	/**
-	 * TODO 根据文件的最后修改时间进行排序 *
+	 * TODO 根据文件的最后修改时间进行排�?*
 	 */
 	private class FileLastModifSort implements Comparator<File> {
 		public int compare(File arg0, File arg1) {
@@ -171,7 +154,7 @@ public class ImageFileCacheOld {
 		}
 	}
 	/**
-	 * 修改文件的最后修改时间 这里需要考虑,是否将使用的图片日期改为当前日期
+	 * 修改文件的最后修改时�?这里�?��考虑,是否将使用的图片日期改为当前日期
 	 * 
 	 * @param path
 	 */
@@ -194,7 +177,7 @@ public class ImageFileCacheOld {
 				.getBlockSize()) / MB;
 		return (int) sdFreeMB;
 	}
-	/** 将url转成文件名 **/
+	/** 将url转成文件�?**/
 	private String convertUrlToFileName(String url) {
 		int start = url.lastIndexOf('/');
 		int end =url.lastIndexOf(".");
@@ -209,7 +192,7 @@ public class ImageFileCacheOld {
 		
 	}
 	/** 获得缓存目录 **/
-	public String getDirectory() {
+	private String getDirectory() {
 		String dir = getSDPath() + "/" + CACHDIR;
 		String substr = dir.substring(0, 4);
 		if (substr.equals("/mnt")) {
@@ -217,13 +200,13 @@ public class ImageFileCacheOld {
 		}
 		return dir;
 	}
-	/**** 取SD卡路径不带/ ****/
+	/**** 取SD卡路径不�? ****/
 	public String getSDPath() {
 		File sdDir = null;
 		boolean sdCardExist = Environment.getExternalStorageState().equals(
-				android.os.Environment.MEDIA_MOUNTED); // 判断sd卡是否存在
+				android.os.Environment.MEDIA_MOUNTED); // 判断sd卡是否存�?
 		if (sdCardExist) {
-			sdDir = Environment.getExternalStorageDirectory();// 获取跟目录
+			sdDir = Environment.getExternalStorageDirectory();// 获取跟目�?
 		}
 		if (sdDir != null) {
 			return sdDir.toString();
