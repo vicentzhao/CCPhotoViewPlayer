@@ -58,7 +58,7 @@ public class HttpRequest {
 	}
 	// 获取下载的uuid
 	public String getURL_UPDATE_APK() {
-		return "http://api.vocy.com/android!getFunction.action?arg0=droidpc_app_getversion&arg1=";
+		return "http://api.pctoo.cn/android!getFunction.action?arg0=droidpc_app_getversion&arg1=";
 	}
 	public String getMac() {
 		return mac;
@@ -98,11 +98,11 @@ public class HttpRequest {
 		return request;
 	}
 	public String getURL_DOWN_UPDATE_APK() {
-		return "http://api.vocy.com/apk_file/" + apkuuid + ".apk";
+		return "http://api.pctoo.cn/apk_file/" + apkuuid + ".apk";
 	}
 	
 	 public String getURL_DETAIL_INFO(){
-		 return STATIC_WEB_ROOT+"html/workplay/workplay_"+type+"_"+id+"_1.txt";
+		 return STATIC_WEB_ROOT+"html/workplay/workplay_"+type+"_"+id+"_1.txt ";
 	 }
 	 
 	public String  getURL_DETAIL_PHOTOPATH(){

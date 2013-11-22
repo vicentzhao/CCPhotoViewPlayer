@@ -115,6 +115,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		String token= i.getStringExtra("mytoken");
 		System.out.println("传过来的sid的============>"+token);
 		String webroot=i.getStringExtra("webRoot");
+		System.out.println("传过来的webroot的============>"+webroot);
 		String sid = i.getStringExtra("sid");
 //		intent.putExtra("artFlag", "27_1");
 		String artFlag =i.getStringExtra("artFlag");
@@ -131,8 +132,9 @@ public class MainActivity extends Activity implements OnClickListener {
 		 if(position!=-1&&currentCount!=-1){
 			 currentCount =12*(currentPage-1)+position+1;
 			 currentPage=(currentCount+49)/50;
+				System.out.println("传过来的currentPage的============>"+currentPage);
 			 HttpRequest.getInstance().setCurrentPage(currentPage);
-			 listcount=currentCount%50-1;
+			 listcount=(currentCount-1)%50;
 				System.out.println("传过来的count的============>"+listcount);
 		 }
 		System.out.println("收到的type为" + type);
@@ -606,8 +608,12 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 		listcount++;
 		if (listcount > pagenationBean.getPageSize() - 1) {
+			//==========================
+			currentPage=pagenationBean.getCurrentPage();
+			//=====================
 			currentPage = currentPage + 1;
 			currentCount = currentCount + 1;
+			System.out.println("currentPage===========>>getNext"+currentPage);
 			HttpRequest.getInstance().setCurrentPage(currentPage);
 			if(isFlag){
 				getAllArtsInfo(HttpRequest.getInstance().getArtsAllPhotos(),true ,false);
@@ -669,8 +675,12 @@ public class MainActivity extends Activity implements OnClickListener {
 
 			} else {
 				if (listcount == 0 && currentPage > 1) {
+					//==========================
+					currentPage=pagenationBean.getCurrentPage();
+					//=====================
 					currentPage = currentPage - 1;
 					currentCount = currentCount - 1;
+					System.out.println("currentPage===========>>getPre"+currentPage);
 					HttpRequest.getInstance().setCurrentPage(currentPage);
 					if(isFlag){
 					getAllArtsInfo(HttpRequest.getInstance().getArtsAllPhotos(),false ,true);
@@ -739,9 +749,7 @@ public class MainActivity extends Activity implements OnClickListener {
 						movie_count.setText(currentCount+"");
 						pagenationBean.init(jopage.getString("currentPage"), jopage.getString("pageSize"), Integer.parseInt(jopage.getString("totalRows")));
 						arts= JSONUtil.getArts(result);
-					
 							imageLoader.loadDrawable(arts.get(listcount).getVideoPath(), mDialog, new ImageCallback() {
-								
 								@Override
 								public void imgeLoader(Bitmap draw, String imgeURL) {
 									image_main.setImageBitmap(draw);
