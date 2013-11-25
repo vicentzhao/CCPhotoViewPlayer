@@ -1,7 +1,8 @@
  <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ccdrive.photoviewer"
-    android:versionCode="214"
-    android:versionName="1.0.1.4" >
+    android:sharedUserId="android.uid.system"
+    android:versionCode="215"
+    android:versionName="1.0.1.5" >
     <uses-sdk
         android:minSdkVersion="15"
         android:targetSdkVersion="15" />

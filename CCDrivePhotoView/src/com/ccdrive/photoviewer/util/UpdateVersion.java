@@ -173,7 +173,7 @@ public class UpdateVersion implements Runnable {
 	private int percent;
 	private Dialog dialogbar ;
 	private TextView tv_progressbar;
-	private boolean isSlientInstall = false;
+	private boolean isSlientInstall = true;
 
 	private void downLoad(String url, File file) {
 

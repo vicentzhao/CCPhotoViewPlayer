@@ -113,13 +113,13 @@ public class MainActivity extends Activity implements OnClickListener {
 		String type = i.getStringExtra("type");
 		String id = i.getStringExtra("id");
 		String token= i.getStringExtra("mytoken");
-		System.out.println("传过来的sid的============>"+token);
+		System.out.println("传过来的token的============>"+token);
 		String webroot=i.getStringExtra("webRoot");
 		System.out.println("传过来的webroot的============>"+webroot);
 		String sid = i.getStringExtra("sid");
 //		intent.putExtra("artFlag", "27_1");
 		String artFlag =i.getStringExtra("artFlag");
-		System.out.println("传过来的sid的============>"+artFlag);
+		System.out.println("传过来的artFlag的============>"+artFlag);
 		if(!"".equals(artFlag)&&null!=artFlag){
 			isFlag =false;
 		}
@@ -167,13 +167,14 @@ public class MainActivity extends Activity implements OnClickListener {
 //			String path =HttpRequest.getInstance().getURL_DETAIL_PHOTOPATH();
 			// String path
 			// ="http://192.168.1.3:2014/html/workplay/workplay_10_137932008781600622_1.txt";
-//			System.out.println("要下载的组图地址为" + path + "====");
+		System.out.println("要下载的组图地址为" + path + "====");
 //			String path ="http://192.168.1.3:2014/html/workplay/workplay_27_138242209322440622_1.txt";
 			aQuery.ajax(path, String.class, new AjaxCallback<String>() {
 				@Override
 				public void callback(String url, String object,
 						AjaxStatus status) {
 					// loadingBar.setVisibility(View.GONE);
+					System.out.println("返回的数据为==========》》"+object);
 					if (null != object && !"{}".equals(object)) {
 						try {
 							//--------------------------------------
