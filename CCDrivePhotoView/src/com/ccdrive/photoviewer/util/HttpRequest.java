@@ -58,7 +58,7 @@ public class HttpRequest {
 	}
 	// 获取下载的uuid
 	public String getURL_UPDATE_APK() {
-		return "http://sys.pctoo.cn/android!getFunction.action?arg0=droidpc_app_getversion&arg1=";
+		return "http://api.pctoo.cn/android!getFunction.action?arg0=droidpc_app_getversion&arg1=";
 	}
 	public String getMac() {
 		return mac;
@@ -98,7 +98,7 @@ public class HttpRequest {
 		return request;
 	}
 	public String getURL_DOWN_UPDATE_APK() {
-		return "http://sys.pctoo.cn/apk_file/" + apkuuid + ".apk";
+		return "http://api.pctoo.cn/apk_file/" + apkuuid + ".apk";
 	}
 	
 	 public String getURL_DETAIL_INFO(){
@@ -141,6 +141,11 @@ public class HttpRequest {
 		 return STATIC_WEB_ROOT + "html/actorwork/actorwork_" + type + "_" + id
 					+ "_" + -1 + "_" + pageSize + "_";
 	 }
+	 
+	public String getPHOTOCHANNLEMAIDEN(){
+		
+		return WEB_ROOT+"androidChannelAction!getMaidenPlay.action?token="+mytoken+"&resultType=json&id="+id;
+	}
 	
 	 
 }

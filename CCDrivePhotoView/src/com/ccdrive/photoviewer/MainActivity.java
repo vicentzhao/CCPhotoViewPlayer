@@ -163,7 +163,14 @@ public class MainActivity extends Activity implements OnClickListener {
 		// setTestData();
 		if (!"3".equals(HttpRequest.getInstance().getType())&&(!"27".equals(HttpRequest.getInstance().getType()))) {
 			photo_content.setVisibility(View.GONE);
-			String path = HttpRequest.getInstance().getURL_DETAIL_INFO();
+			String path ="";
+			if("25".equals(HttpRequest.getInstance().getType())){
+				path =HttpRequest.getInstance().getPHOTOCHANNLEMAIDEN();
+				
+			}else{
+				
+				 path = HttpRequest.getInstance().getURL_DETAIL_INFO();
+			}
 //			String path =HttpRequest.getInstance().getURL_DETAIL_PHOTOPATH();
 			// String path
 			// ="http://192.168.1.3:2014/html/workplay/workplay_10_137932008781600622_1.txt";
@@ -183,7 +190,14 @@ public class MainActivity extends Activity implements OnClickListener {
 							
 							//----------------------------------------
 							System.out.println("下载下来的组图信息"+ object);
-							JSONArray jaArray = new JSONArray(object);
+							JSONArray jaArray;
+							if("25".equals(HttpRequest.getInstance().getType())){
+								JSONObject jsonObject = new JSONObject(object);
+								jaArray =jsonObject.getJSONArray("data");
+								
+							}else{
+								 jaArray = new JSONArray(object);
+							}
 							if (null != jaArray && jaArray.length() != 0) {
 								for (int j = 0; j < jaArray.length(); j++) {
 								   	JSONObject jo = jaArray.getJSONObject(j);
@@ -266,6 +280,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			getAllArtsInfo(url, false,false);
 			
 		}
+		
 		
 	}    
 //    ArrayList list = new ArrayList();
