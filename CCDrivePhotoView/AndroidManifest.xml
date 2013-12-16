@@ -1,7 +1,7 @@
  <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ccdrive.photoviewer"
-    android:versionCode="216"
-    android:versionName="1.0.1.6" >
+    android:versionCode="224"
+    android:versionName="1.0.2.4" >
 <!--     android:sharedUserId="android.uid.system" -->
     <uses-sdk
         android:minSdkVersion="15"
@@ -29,8 +29,8 @@
             android:name=".MainActivity"
             android:label="@string/title_activity_main" >
             <intent-filter>
-                
-                <action android:name="com.ccdrive.photoviewer.MainActivity" />
+             <!--<action android:name="com.ccdrive.photoviewer.MainActivity" />-->   
+                <action android:name="android.intent.action.MAIN" />
               <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>

@@ -1,5 +1,7 @@
 package com.ccdrive.photoviewer.util;
 
+import com.ccdrive.photoviewer.content.Constant;
+
 
 public class HttpRequest {
 	private String WEB_ROOT = "http://apk.vocy.com/";
@@ -57,9 +59,12 @@ public class HttpRequest {
 		return mytoken;
 	}
 	// 获取下载的uuid
-	public String getURL_UPDATE_APK() {
-		return "http://api.pctoo.cn/android!getFunction.action?arg0=droidpc_app_getversion&arg1=";
-	}
+		public String getURL_UPDATE_APK( ) {
+			if(Constant.isSlientInstall){
+				return "http://sys.pctoo.cn/android!getFunction.action?arg0=droidpc_app_getversion&arg1=";
+			}
+				return "http://api.pctoo.cn/android!getFunction.action?arg0=droidpc_app_getversion&arg1=";		
+		}
 	public String getMac() {
 		return mac;
 	}
@@ -98,12 +103,10 @@ public class HttpRequest {
 		return request;
 	}
 	public String getURL_DOWN_UPDATE_APK() {
-		return "http://api.pctoo.cn/apk_file/" + apkuuid + ".apk";
+		return "http://sys.pctoo.cn/apk_file/" + apkuuid + ".apk";
 	}
 	
-	 public String getURL_DETAIL_INFO(){
-		 return STATIC_WEB_ROOT+"html/workplay/workplay_"+type+"_"+id+"_1.txt";
-	 }
+
 	 
 	public String  getURL_DETAIL_PHOTOPATH(){
 		return "http://192.168.1.3:8080/androidMagazineChannelAction!" +
@@ -131,6 +134,7 @@ public class HttpRequest {
 		 		".action?token="+mytoken+"&resultType=json&pageSize="+pageSize+
 		 		"&currentPage="+currentPage+"&channelid="+type+"&sid="+sid+"";
 	 }
+	 //获取艺术作品
 	 public String getArtsPeoPleAllPhotos(){
 		 return WEB_ROOT+"androidChannelAction!getWorkPlay" +
 				 ".action?token="+mytoken+"&resultType=json&pageSize="+pageSize+
@@ -141,11 +145,25 @@ public class HttpRequest {
 		 return STATIC_WEB_ROOT + "html/actorwork/actorwork_" + type + "_" + id
 					+ "_" + -1 + "_" + pageSize + "_";
 	 }
-	 
+	 //女性组图
 	public String getPHOTOCHANNLEMAIDEN(){
 		
 		return WEB_ROOT+"androidChannelAction!getMaidenPlay.action?token="+mytoken+"&resultType=json&id="+id;
 	}
 	
+	
+	//新闻作品组图接口
+	public String getURL_NEWS() {
+		return WEB_ROOT+"androidChannelAction!getWorkPlay.action?token="+mytoken+"&resultType=json&channelid="+type+"&id="+id;
+	}
+	
+	//获取组图
+	public String getURL_TODAY_INFO() {
+		return WEB_ROOT + "todayrec!querypic.action?jsonType=json&tid="+id;
+	}
+	 public String getURL_DETAIL_INFO(){
+		 return STATIC_WEB_ROOT+"html/workplay/workplay_"+type+"_"+id+"_1.txt";
+	 }
+
 	 
 }

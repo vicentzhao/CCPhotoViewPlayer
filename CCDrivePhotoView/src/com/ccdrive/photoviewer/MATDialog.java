@@ -25,7 +25,7 @@ public class MATDialog extends Dialog {
 
 		private View initContentView() {
 			View v = LayoutInflater.from(getContext()).inflate(R.layout.promptdialog, null);
-//			msgText = (TextView) v.findViewById(R.id.tv_loading);
+//			msgText = (TextView) v.findViewById(R. .tv_loading);
 //			progressText = (TextView) v.findViewById(R.id.tv_processbar);
 			logo = (ImageView) v.findViewById(R.id.iv_loading);
 			logo.setAnimation(AnimationUtils.loadAnimation(mContext, R.anim.logoanmi));
@@ -45,7 +45,7 @@ public class MATDialog extends Dialog {
 		void setMessage(String msg) {
 			if (msg == null)
 				return;
-			msgText.setText(msg);
+			    
 		}
 
 		void setProgress(int progress) {

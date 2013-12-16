@@ -46,7 +46,8 @@ public class ImageAsyncLoader {
 	}
 
 	public Bitmap loadDrawable(final String imageURL,final MATDialog mDialog,
-			final ImageCallback imageCallback) {
+			final ImageCallback imageCallback
+			) {
 		this.mDialog =mDialog;
 		final Handler handler = new Handler() {
 			@Override

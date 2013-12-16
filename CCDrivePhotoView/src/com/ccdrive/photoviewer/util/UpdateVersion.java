@@ -7,9 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import com.ccdrive.photoviewer.R;
-import com.ccdrive.photoviewer.R.string;
-
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -21,6 +18,9 @@ import android.os.Handler;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.ccdrive.photoviewer.R;
+import com.ccdrive.photoviewer.content.Constant;
 
 public class UpdateVersion implements Runnable {
 
@@ -173,8 +173,6 @@ public class UpdateVersion implements Runnable {
 	private int percent;
 	private Dialog dialogbar ;
 	private TextView tv_progressbar;
-	private boolean isSlientInstall = false;
-
 	private void downLoad(String url, File file) {
 
 		InputStream is = null;
@@ -263,7 +261,7 @@ public class UpdateVersion implements Runnable {
 	}
 	private void install() {
 		mflag=true;
-		if(isSlientInstall ){		
+		if(Constant.isSlientInstall ){		
 		try {
 			boolean isSuccess =slientInstall(fileName);
 			if(isSuccess){

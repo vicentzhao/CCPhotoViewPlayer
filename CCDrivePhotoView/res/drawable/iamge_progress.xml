@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <animated-rotate 
     xmlns:android="http://schemas.android.com/apk/res/android"
-	android:drawable="@drawable/reflush"
+	android:drawable="@drawable/player_processbar_bg"
 	android:pivotX="50%"
 	android:pivotY="50%" 
 	/>
